@@ -1,0 +1,229 @@
+<!DOCTYPE html>
+<html lang="bn">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>অ্যাডমিন প্যানেল</title>
+    <style>
+        body { font-family: 'Segoe UI', sans-serif; background-color: #f4f7f6; margin: 0; display: flex; }
+        .sidebar { width: 250px; background-color: #2c3e50; color: white; height: 100vh; position: fixed; overflow-y: auto; }
+        .sidebar h2 { text-align: center; padding: 20px 0; border-bottom: 1px solid #34495e; margin: 0; }
+        .sidebar ul { list-style: none; padding: 0; margin: 0; }
+        .sidebar ul li { padding: 15px 25px; cursor: pointer; border-bottom: 1px solid #34495e; transition: 0.3s; }
+        .sidebar ul li:hover, .sidebar ul li.active { background-color: #3498db; }
+        .main-content { margin-left: 250px; flex-grow: 1; padding: 30px; }
+        .page-section { display: none; }
+        .page-section.active { display: block; }
+        .data-table { background: white; padding: 20px; border-radius: 8px; box-shadow: 0 2px 5px rgba(0,0,0,0.1); overflow-x: auto; margin-bottom: 20px; }
+        table { width: 100%; border-collapse: collapse; min-width: 600px; }
+        th, td { border: 1px solid #ddd; padding: 12px; text-align: left; }
+        th { background-color: #f8f9fa; }
+        .btn { padding: 6px 12px; border: none; border-radius: 4px; cursor: pointer; color: white; margin: 2px; }
+        .btn-approve { background-color: #28a745; }
+        .btn-reject { background-color: #dc3545; }
+        .btn-blue { background-color: #007bff; }
+        input, textarea { width: 100%; padding: 10px; margin: 5px 0 15px 0; border: 1px solid #ccc; border-radius: 4px; box-sizing: border-box; }
+    </style>
+</head>
+<body>
+    <div class="sidebar">
+        <h2>অ্যাডমিন প্যানেল</h2>
+        <ul>
+            <li class="nav-btn active" onclick="showSection('dashboard')">ড্যাশবোর্ড</li>
+            <li class="nav-btn" onclick="showSection('deposits')">ডিপোজিট রিকোয়েস্ট</li>
+            <li class="nav-btn" onclick="showSection('withdraws')">উত্তোলন রিকোয়েস্ট</li>
+            <li class="nav-btn" onclick="showSection('users')">ইউজার লিস্ট & স্ট্যাটস</li>
+            <li class="nav-btn" onclick="showSection('settings')">সেটিংস</li>
+        </ul>
+    </div>
+
+    <div class="main-content">
+        <div id="dashboard" class="page-section active">
+            <h1>ড্যাশবোর্ড</h1>
+            <div class="data-table">
+                <p>সার্ভার স্ট্যাটাস: <strong id="firebase-status" style="color:orange">চেক করা হচ্ছে...</strong></p>
+            </div>
+        </div>
+
+        <div id="deposits" class="page-section">
+            <h1>🟡 পেন্ডিং ডিপোজিট</h1>
+            <div class="data-table">
+                <table><thead><tr><th>ইউজার</th><th>পরিমাণ + বোনাস</th><th>মেথড & TrxID</th><th>অ্যাকশন</th></tr></thead><tbody id="deposit-list"></tbody></table>
+            </div>
+        </div>
+
+        <div id="withdraws" class="page-section">
+            <h1>⏳ পেন্ডিং উত্তোলন</h1>
+            <div class="data-table">
+                <table><thead><tr><th>ইউজার</th><th>পরিমাণ</th><th>নম্বর</th><th>অ্যাকশন</th></tr></thead><tbody id="withdraw-list"></tbody></table>
+            </div>
+        </div>
+
+        <div id="users" class="page-section">
+            <h1>👥 ইউজার ম্যানেজমেন্ট</h1>
+            <div class="data-table">
+                <button class="btn btn-blue" onclick="loadUserStats()">🔄 ডাটা রিফ্রেশ</button>
+                <input type="text" id="search-box" onkeyup="filterUsers()" placeholder="নাম বা আইডি সার্চ..." style="margin-top:10px;">
+                <table>
+                    <thead><tr><th>নাম & আইডি</th><th>ব্যালেন্স</th><th>রেফার</th><th>মোট ডিপোজিট</th><th>মোট উত্তোলন</th><th>এডিট ব্যালেন্স</th></tr></thead>
+                    <tbody id="user-stats-body"><tr><td colspan="6">রিফ্রেশ বাটনে ক্লিক করুন</td></tr></tbody>
+                </table>
+            </div>
+        </div>
+
+        <div id="settings" class="page-section">
+            <h1>সেটিংস</h1>
+            <div class="data-table">
+                <h3>নোটিশ ও নিয়ম</h3>
+                <label>নোটিশ:</label> <textarea id="notice-input"></textarea>
+                <button class="btn btn-blue" onclick="saveNotice()">সেভ</button>
+                <br><br>
+                <label>নিয়ম:</label> <textarea id="rules-input"></textarea>
+                <button class="btn btn-blue" onclick="saveRules()">সেভ</button>
+            </div>
+            <div class="data-table">
+                <h3>পেমেন্ট নম্বর</h3>
+                <label>বিকাশ:</label> <input type="text" id="bkash-num">
+                <label>নগদ:</label> <input type="text" id="nagad-num">
+                <button class="btn btn-blue" onclick="saveNumbers()">সেভ</button>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-database.js"></script>
+    <script>
+        const firebaseConfig = {
+          apiKey: "AIzaSyCF9cqEoQwPow2VbB0Koj1yyy4QMDofPQE",
+          authDomain: "investmentwebsite1.firebaseapp.com",
+          databaseURL: "https://investmentwebsite1-default-rtdb.firebaseio.com", 
+          projectId: "investmentwebsite1",
+          storageBucket: "investmentwebsite1.firebasestorage.app",
+          messagingSenderId: "592540774650",
+          appId: "1:592540774650:web:1ad31bf96cbc8c60db1943",
+          measurementId: "G-QLTC23GYRE"
+        };
+        firebase.initializeApp(firebaseConfig);
+        const db = firebase.database();
+
+        db.ref(".info/connected").on("value", s => {
+            document.getElementById('firebase-status').innerText = s.val() ? "অনলাইন ✅" : "অফলাইন ❌";
+            document.getElementById('firebase-status').style.color = s.val() ? "green" : "red";
+        });
+
+        function showSection(id) {
+            document.querySelectorAll('.page-section').forEach(d => d.classList.remove('active'));
+            document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
+            document.getElementById(id).classList.add('active');
+            if(id === 'users') loadUserStats();
+        }
+
+        // রিকোয়েস্ট হ্যান্ডলিং
+        db.ref('deposits').orderByChild('status').equalTo('pending').on('value', s => {
+            const el = document.getElementById('deposit-list'); el.innerHTML = '';
+            if(!s.exists()) { el.innerHTML = '<tr><td colspan="4">নেই</td></tr>'; return; }
+            s.forEach(d => {
+                const v = d.val();
+                el.innerHTML += `<tr>
+                    <td>${v.userName}<br><small>${v.userId}</small></td>
+                    <td>৳${v.amount} + ${v.bonus}</td>
+                    <td>${v.method}<br><small>${v.trxId}</small></td>
+                    <td><button class="btn btn-approve" onclick="approveDep('${d.key}')">✔</button> <button class="btn btn-reject" onclick="rejectDep('${d.key}')">✖</button></td>
+                </tr>`;
+            });
+        });
+
+        db.ref('withdrawals').orderByChild('status').equalTo('pending').on('value', s => {
+            const el = document.getElementById('withdraw-list'); el.innerHTML = '';
+            if(!s.exists()) { el.innerHTML = '<tr><td colspan="4">নেই</td></tr>'; return; }
+            s.forEach(d => {
+                const v = d.val();
+                el.innerHTML += `<tr>
+                    <td>${v.userName}<br><small>${v.userId}</small></td>
+                    <td>৳${v.amount}</td>
+                    <td>${v.number} (${v.method})</td>
+                    <td><button class="btn btn-approve" onclick="approveWid('${d.key}')">✔</button> <button class="btn btn-reject" onclick="rejectWid('${d.key}')">✖</button></td>
+                </tr>`;
+            });
+        });
+
+        function approveDep(k) {
+            if(!confirm("এপ্রুভ করবেন?")) return;
+            db.ref('deposits/'+k).get().then(s => {
+                const d = s.val();
+                db.ref('users/'+d.userId+'/balance').transaction(c => (c||0) + d.amount + d.bonus)
+                .then(() => db.ref('deposits/'+k).update({status:'approved'}));
+            });
+        }
+        function rejectDep(k) { if(confirm("বাতিল করবেন?")) db.ref('deposits/'+k).update({status:'rejected'}); }
+
+        function approveWid(k) { if(confirm("টাকা দিয়েছেন?")) db.ref('withdrawals/'+k).update({status:'approved'}); }
+        function rejectWid(k) {
+            if(!confirm("বাতিল করবেন?")) return;
+            db.ref('withdrawals/'+k).get().then(s => {
+                db.ref('users/'+s.val().userId+'/balance').transaction(c => (c||0) + s.val().amount)
+                .then(() => db.ref('withdrawals/'+k).update({status:'rejected'}));
+            });
+        }
+
+        // ইউজার স্ট্যাটস
+        async function loadUserStats() {
+            const tbody = document.getElementById('user-stats-body');
+            tbody.innerHTML = '<tr><td colspan="6">লোড হচ্ছে...</td></tr>';
+            const [users, deps, wids] = await Promise.all([db.ref('users').get(), db.ref('deposits').get(), db.ref('withdrawals').get()]);
+            
+            if(!users.exists()) { tbody.innerHTML = '<tr><td colspan="6">ইউজার নেই</td></tr>'; return; }
+
+            let data = {};
+            users.forEach(u => data[u.key] = { ...u.val(), key: u.key, refs: 0, tDep: 0, tWid: 0 });
+
+            Object.values(data).forEach(u => { if(u.referredBy && data[u.referredBy]) data[u.referredBy].refs++; });
+
+            if(deps.exists()) deps.forEach(d => { if(d.val().status === 'approved' && data[d.val().userId]) data[d.val().userId].tDep += (d.val().amount + d.val().bonus); });
+            if(wids.exists()) wids.forEach(w => { if(w.val().status === 'approved' && data[w.val().userId]) data[w.val().userId].tWid += w.val().amount; });
+
+            tbody.innerHTML = '';
+            Object.values(data).reverse().forEach(u => {
+                tbody.innerHTML += `<tr>
+                    <td>${u.name}<br><small>${u.key}</small></td>
+                    <td style="color:blue;font-weight:bold">৳${u.balance}</td>
+                    <td>${u.refs}</td>
+                    <td style="color:green">৳${u.tDep}</td>
+                    <td style="color:red">৳${u.tWid}</td>
+                    <td><input type="number" id="b-${u.key}" style="width:80px;margin:0" placeholder="New"> <button class="btn btn-blue" onclick="setBal('${u.key}')">Set</button></td>
+                </tr>`;
+            });
+        }
+
+        function setBal(uid) {
+            const val = parseFloat(document.getElementById('b-'+uid).value);
+            if(!isNaN(val) && confirm('ব্যালেন্স আপডেট করবেন?')) db.ref('users/'+uid).update({balance:val}).then(()=>{alert('হয়েছে'); loadUserStats();});
+        }
+        function filterUsers() {
+            const filter = document.getElementById('search-box').value.toUpperCase();
+            const tr = document.getElementById('user-stats-body').getElementsByTagName('tr');
+            for(let i=0; i<tr.length; i++) {
+                const td = tr[i].getElementsByTagName('td')[0];
+                if(td) tr[i].style.display = td.textContent.toUpperCase().indexOf(filter) > -1 ? "" : "none";
+            }
+        }
+
+        // সেটিংস
+        function saveNotice() { db.ref('settings/notice').set({text: document.getElementById('notice-input').value}).then(()=>alert('Saved')); }
+        function saveRules() { db.ref('settings/rules').set({text: document.getElementById('rules-input').value}).then(()=>alert('Saved')); }
+        function saveNumbers() { db.ref('settings/paymentNumbers').set({bkash: document.getElementById('bkash-num').value, nagad: document.getElementById('nagad-num').value}).then(()=>alert('Saved')); }
+
+        // সেটিংস লোড
+        db.ref('settings').get().then(s => {
+            if(s.exists()) {
+                if(s.val().notice) document.getElementById('notice-input').value = s.val().notice.text;
+                if(s.val().rules) document.getElementById('rules-input').value = s.val().rules.text;
+                if(s.val().paymentNumbers) {
+                    document.getElementById('bkash-num').value = s.val().paymentNumbers.bkash;
+                    document.getElementById('nagad-num').value = s.val().paymentNumbers.nagad;
+                }
+            }
+        });
+    </script>
+</body>
+</html>
