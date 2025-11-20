@@ -23,6 +23,10 @@
         .btn-reject { background-color: #dc3545; }
         .btn-blue { background-color: #007bff; }
         input, textarea { width: 100%; padding: 10px; margin: 5px 0 15px 0; border: 1px solid #ccc; border-radius: 4px; box-sizing: border-box; }
+        
+        /* নতুন: আইপি ব্যাজ */
+        .ip-badge { background-color: #eef2f3; color: #555; padding: 4px; border-radius: 4px; font-family: monospace; font-size: 0.9em; display: block; margin-top: 5px; }
+        .loc-badge { font-size: 0.85em; color: #888; }
     </style>
 </head>
 <body>
@@ -32,8 +36,7 @@
             <li class="nav-btn active" onclick="showSection('dashboard')">ড্যাশবোর্ড</li>
             <li class="nav-btn" onclick="showSection('deposits')">ডিপোজিট রিকোয়েস্ট</li>
             <li class="nav-btn" onclick="showSection('withdraws')">উত্তোলন রিকোয়েস্ট</li>
-            <li class="nav-btn" onclick="showSection('users')">ইউজার লিস্ট & স্ট্যাটস</li>
-            <li class="nav-btn" onclick="showSection('settings')">সেটিংস</li>
+            <li class="nav-btn" onclick="showSection('users')">ইউজার & ট্র্যাকিং</li> <li class="nav-btn" onclick="showSection('settings')">সেটিংস</li>
         </ul>
     </div>
 
@@ -60,13 +63,22 @@
         </div>
 
         <div id="users" class="page-section">
-            <h1>👥 ইউজার ম্যানেজমেন্ট</h1>
+            <h1>👥 ইউজার ম্যানেজমেন্ট & ট্র্যাকিং</h1>
             <div class="data-table">
                 <button class="btn btn-blue" onclick="loadUserStats()">🔄 ডাটা রিফ্রেশ</button>
                 <input type="text" id="search-box" onkeyup="filterUsers()" placeholder="নাম বা আইডি সার্চ..." style="margin-top:10px;">
                 <table>
-                    <thead><tr><th>নাম & আইডি</th><th>ব্যালেন্স</th><th>রেফার</th><th>মোট ডিপোজিট</th><th>মোট উত্তোলন</th><th>এডিট ব্যালেন্স</th></tr></thead>
-                    <tbody id="user-stats-body"><tr><td colspan="6">রিফ্রেশ বাটনে ক্লিক করুন</td></tr></tbody>
+                    <thead>
+                        <tr>
+                            <th>নাম & আইডি</th>
+                            <th>লোকেশন & VIP IP</th> <th>ব্যালেন্স</th>
+                            <th>রেফার</th>
+                            <th>মোট ডিপোজিট</th>
+                            <th>মোট উত্তোলন</th>
+                            <th>এডিট ব্যালেন্স</th>
+                        </tr>
+                    </thead>
+                    <tbody id="user-stats-body"><tr><td colspan="7">রিফ্রেশ বাটনে ক্লিক করুন</td></tr></tbody>
                 </table>
             </div>
         </div>
@@ -166,16 +178,25 @@
             });
         }
 
-        // ইউজার স্ট্যাটস
+        // ইউজার স্ট্যাটস (আপডেটেড)
         async function loadUserStats() {
             const tbody = document.getElementById('user-stats-body');
-            tbody.innerHTML = '<tr><td colspan="6">লোড হচ্ছে...</td></tr>';
+            tbody.innerHTML = '<tr><td colspan="7">লোড হচ্ছে...</td></tr>';
             const [users, deps, wids] = await Promise.all([db.ref('users').get(), db.ref('deposits').get(), db.ref('withdrawals').get()]);
             
-            if(!users.exists()) { tbody.innerHTML = '<tr><td colspan="6">ইউজার নেই</td></tr>'; return; }
+            if(!users.exists()) { tbody.innerHTML = '<tr><td colspan="7">ইউজার নেই</td></tr>'; return; }
 
             let data = {};
-            users.forEach(u => data[u.key] = { ...u.val(), key: u.key, refs: 0, tDep: 0, tWid: 0 });
+            // এখানে আইপি এবং লোকেশন রিড করা হচ্ছে
+            users.forEach(u => data[u.key] = { 
+                ...u.val(), 
+                key: u.key, 
+                refs: 0, 
+                tDep: 0, 
+                tWid: 0,
+                ip: u.val().ip || 'N/A',
+                location: u.val().location || 'N/A'
+            });
 
             Object.values(data).forEach(u => { if(u.referredBy && data[u.referredBy]) data[u.referredBy].refs++; });
 
@@ -186,6 +207,10 @@
             Object.values(data).reverse().forEach(u => {
                 tbody.innerHTML += `<tr>
                     <td>${u.name}<br><small>${u.key}</small></td>
+                    <td>
+                        <div class="loc-badge">📍 ${u.location}</div>
+                        <span class="ip-badge">IP: ${u.ip}</span>
+                    </td>
                     <td style="color:blue;font-weight:bold">৳${u.balance}</td>
                     <td>${u.refs}</td>
                     <td style="color:green">৳${u.tDep}</td>
@@ -213,7 +238,6 @@
         function saveRules() { db.ref('settings/rules').set({text: document.getElementById('rules-input').value}).then(()=>alert('Saved')); }
         function saveNumbers() { db.ref('settings/paymentNumbers').set({bkash: document.getElementById('bkash-num').value, nagad: document.getElementById('nagad-num').value}).then(()=>alert('Saved')); }
 
-        // সেটিংস লোড
         db.ref('settings').get().then(s => {
             if(s.exists()) {
                 if(s.val().notice) document.getElementById('notice-input').value = s.val().notice.text;
