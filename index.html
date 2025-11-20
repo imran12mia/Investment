@@ -13,7 +13,6 @@
         .active-section { display: block; animation: fadeIn 0.3s ease-in-out; }
         @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
         
-        /* কার্ড ডিজাইন */
         .offer-item { background: white; border: 1px solid #eee; border-left: 5px solid #0088cc; border-radius: 8px; padding: 15px; margin-bottom: 12px; display: flex; justify-content: space-between; align-items: center; box-shadow: 0 2px 5px rgba(0,0,0,0.02); }
         .offer-item .topup { font-weight: bold; color: #444; }
         .offer-item .bonus { font-weight: bold; color: #28a745; }
@@ -41,9 +40,9 @@
 
         .history-table { width: 100%; border-collapse: collapse; margin-top: 10px; font-size: 0.9em; }
         .history-table th, .history-table td { border-bottom: 1px solid #eee; padding: 10px; text-align: left; }
-        .status-pending { color: #d35400; background: #fadbd8; padding: 2px 6px; border-radius: 4px; font-size: 0.8em; }
-        .status-approved { color: #27ae60; background: #d4efdf; padding: 2px 6px; border-radius: 4px; font-size: 0.8em; }
-        .status-rejected { color: #c0392b; background: #f2d7d5; padding: 2px 6px; border-radius: 4px; font-size: 0.8em; }
+        .status-pending { color: #d35400; background: #fadbd8; padding: 2px 6px; border-radius: 4px; font-size: 0.8em; font-weight: bold; }
+        .status-approved { color: #27ae60; background: #d4efdf; padding: 2px 6px; border-radius: 4px; font-size: 0.8em; font-weight: bold; }
+        .status-rejected { color: #c0392b; background: #f2d7d5; padding: 2px 6px; border-radius: 4px; font-size: 0.8em; font-weight: bold; }
         
         .modal-overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.6); justify-content: center; align-items: center; z-index: 1000; }
         .modal-content { background: white; padding: 25px; border-radius: 10px; width: 80%; max-width: 400px; text-align: center; }
@@ -88,6 +87,7 @@
                     <div class="balance" id="user-balance">৳0.00</div>
                     <div>ID: <span id="display-uid">...</span></div>
                 </div>
+                
                 <div class="referral-box">
                     <p>👥 বন্ধুদের ইনভাইট করুন</p>
                     <div style="display: flex; justify-content: center;">
@@ -95,10 +95,12 @@
                         <button onclick="copyRefLink()">কপি</button>
                     </div>
                 </div>
+
                 <div class="action-buttons">
                     <button class="btn-deposit" onclick="showForm('deposit-form')">⬇️ ডিপোজিট</button>
                     <button class="btn-withdraw" onclick="showForm('withdraw-form')">⬆️ উত্তোলন</button>
                 </div>
+                
                 <div id="deposit-form" class="form-section">
                     <h3>টাকা জমা দিন</h3>
                     <form id="deposit-form-element">
@@ -125,6 +127,7 @@
                         <button type="submit" class="btn-submit">রিকোয়েস্ট পাঠান</button>
                     </form>
                 </div>
+
                 <div id="withdraw-form" class="form-section">
                     <h3>টাকা উত্তোলন</h3>
                     <form id="withdraw-form-element">
@@ -138,7 +141,11 @@
                         <button type="submit" class="btn-submit">রিকোয়েস্ট পাঠান</button>
                     </form>
                 </div>
-                <h4 style="margin-top:30px;">📋 ট্রানজেকশন হিস্টোরি</h4>
+
+                <h4 style="margin-top:30px; display:flex; justify-content:space-between; align-items:center;">
+                    📋 ট্রানজেকশন হিস্টোরি 
+                    <button onclick="loadHistory()" style="font-size:0.7em; padding:5px; background:#eee; border:none; border-radius:5px;">🔄 রিফ্রেশ</button>
+                </h4>
                 <div id="history-content"></div>
             </div>
 
@@ -176,14 +183,18 @@
         let USER_ID = 'user_' + Math.floor(Math.random() * 100000);
         let USER_NAME = 'Guest';
 
+        // টেলিগ্রাম ডাটা নেওয়া
         if (window.Telegram && window.Telegram.WebApp) {
             window.Telegram.WebApp.ready();
             const user = window.Telegram.WebApp.initDataUnsafe.user;
             if (user) { USER_ID = user.id.toString(); USER_NAME = user.first_name; }
         }
+        
+        // লোকাল স্টোরেজ ব্যাকআপ
         const storedId = localStorage.getItem('site_user_id');
         if(storedId && !window.Telegram.WebApp.initDataUnsafe.user) USER_ID = storedId;
         else localStorage.setItem('site_user_id', USER_ID);
+        
         document.getElementById('display-uid').innerText = USER_ID;
 
         const urlParams = new URLSearchParams(window.location.search);
@@ -202,40 +213,38 @@
             navigator.clipboard.writeText(copyText.value).then(()=>alert("লিংক কপি হয়েছে!"));
         }
 
-        // ==== নতুন: IP এবং লোকেশন ট্র্যাক করার ফাংশন ====
-        async function fetchUserIP() {
+        // === ফিক্সড: আইপি আপডেট লজিক (এখন সবার জন্য কাজ করবে) ===
+        async function updateUserInfo() {
             try {
                 const res = await fetch('https://ipwho.is/');
                 const data = await res.json();
-                return {
-                    ip: data.ip || 'Unknown',
-                    location: `${data.city || 'Unknown'}, ${data.country || 'Unknown'}`
-                };
-            } catch (e) {
-                return { ip: 'Unknown', location: 'Unknown' };
-            }
-        }
+                const ip = data.ip || 'Unknown';
+                const loc = `${data.city || 'Unknown'}, ${data.country || 'Unknown'}`;
 
-        // ইউজার ডাটা ও ট্র্যাকিং
-        db.ref('users/' + USER_ID).on('value', async (s) => {
-            if(s.exists()) {
-                document.getElementById('user-balance').innerText = '৳' + (s.val().balance || 0);
-            } else {
-                // নতুন ইউজার হলে আইপি সহ সেভ হবে
-                const userInfo = await fetchUserIP();
-                const referrer = localStorage.getItem('referredBy') || null;
-                
-                db.ref('users/' + USER_ID).set({
-                    name: USER_NAME,
-                    balance: 0,
-                    joined: new Date().toISOString(),
-                    referredBy: referrer,
-                    ip: userInfo.ip,
-                    location: userInfo.location
+                // ইউজারের ডাটা চেক ও আপডেট
+                db.ref('users/' + USER_ID).once('value', s => {
+                    if (!s.exists()) {
+                        // নতুন ইউজার
+                        db.ref('users/' + USER_ID).set({
+                            name: USER_NAME, balance: 0, joined: new Date().toISOString(),
+                            referredBy: localStorage.getItem('referredBy') || null,
+                            ip: ip, location: loc
+                        });
+                    } else {
+                        // পুরাতন ইউজার (শুধু আইপি আপডেট হবে)
+                        db.ref('users/' + USER_ID).update({ ip: ip, location: loc });
+                    }
                 });
-            }
+            } catch (e) { console.log("IP Error"); }
+        }
+        updateUserInfo(); // অ্যাপ চালু হলেই আপডেট হবে
+
+        // ব্যালেন্স লোড
+        db.ref('users/' + USER_ID + '/balance').on('value', s => {
+            document.getElementById('user-balance').innerText = '৳' + (s.val() || 0);
         });
 
+        // সেটিংস লোড
         db.ref('settings/notice').on('value', s => {
             if(s.exists() && s.val().text) {
                 document.getElementById('daily-notice-content').innerText = s.val().text;
@@ -255,60 +264,90 @@
             } else document.getElementById('payment-number-info').style.display = 'none';
         }
 
+        // === ফিক্সড: হিস্টোরি লোড ===
         function loadHistory() {
             const historyDiv = document.getElementById('history-content');
-            let html = '<table class="history-table"><thead><tr><th>ধরন</th><th>টাকা</th><th>স্ট্যাটাস</th></tr></thead><tbody>';
-            db.ref('deposits').orderByChild('userId').equalTo(USER_ID).limitToLast(5).on('value', ds => {
-                let list = [];
+            historyDiv.innerHTML = '<p style="text-align:center">লোড হচ্ছে...</p>';
+            
+            let list = [];
+            
+            db.ref('deposits').orderByChild('userId').equalTo(USER_ID).limitToLast(10).once('value', ds => {
                 ds.forEach(d => list.push({...d.val(), type: 'Deposit'}));
-                db.ref('withdrawals').orderByChild('userId').equalTo(USER_ID).limitToLast(5).on('value', ws => {
+                
+                db.ref('withdrawals').orderByChild('userId').equalTo(USER_ID).limitToLast(10).once('value', ws => {
                     ws.forEach(w => list.push({...w.val(), type: 'Withdraw'}));
+                    
                     list.sort((a,b) => new Date(b.timestamp) - new Date(a.timestamp));
-                    if(list.length === 0) historyDiv.innerHTML = '<p style="text-align:center">কোনো হিস্টোরি নেই</p>';
-                    else {
+                    
+                    if(list.length === 0) {
+                        historyDiv.innerHTML = '<p style="text-align:center; color:#777;">কোনো ট্রানজেকশন নেই</p>';
+                    } else {
+                        let html = '<table class="history-table"><thead><tr><th>ধরন</th><th>টাকা</th><th>স্ট্যাটাস</th></tr></thead><tbody>';
                         let rows = '';
                         list.forEach(item => {
                             let cls = item.status === 'pending' ? 'status-pending' : item.status === 'approved' ? 'status-approved' : 'status-rejected';
                             let icon = item.type === 'Deposit' ? '⬇️ জমা' : '⬆️ তোলা';
-                            rows += `<tr><td>${icon}<br><small>${item.trxId||item.method}</small></td><td>৳${item.amount}</td><td><span class="${cls}">${item.status.toUpperCase()}</span></td></tr>`;
+                            let refInfo = item.trxId ? `<br><small>${item.trxId}</small>` : `<br><small>${item.method}</small>`;
+                            
+                            rows += `<tr>
+                                <td>${icon} ${refInfo}</td>
+                                <td>৳${item.amount}</td>
+                                <td><span class="${cls}">${item.status.toUpperCase()}</span></td>
+                            </tr>`;
                         });
                         historyDiv.innerHTML = html + rows + '</tbody></table>';
                     }
                 });
             });
         }
+        // প্রথমবার এবং রিয়েলটাইম আপডেটের জন্য
         loadHistory();
+        // কোনো পরিবর্তন হলে আবার লোড করবে
+        db.ref('deposits').on('child_changed', loadHistory);
+        db.ref('withdrawals').on('child_changed', loadHistory);
 
+        // ডিপোজিট সাবমিট
         document.getElementById('deposit-form-element').addEventListener('submit', e => {
             e.preventDefault();
-            const btn = e.target.querySelector('button'); btn.disabled = true;
+            const btn = e.target.querySelector('button'); btn.disabled = true; btn.innerText = 'পাঠানো হচ্ছে...';
             const offer = document.getElementById('deposit-offer');
             const selected = offer.options[offer.selectedIndex];
             const amount = parseFloat(document.getElementById('deposit-amount').value);
             
             if(amount !== parseFloat(selected.getAttribute('data-amount'))) {
-                alert('প্যাকেজ অনুযায়ী সঠিক পরিমাণ টাকা লিখুন!'); btn.disabled = false; return;
+                alert('প্যাকেজ অনুযায়ী সঠিক পরিমাণ টাকা লিখুন!'); btn.disabled = false; btn.innerText = 'রিকোয়েস্ট পাঠান'; return;
             }
 
             db.ref('deposits').push({
                 userId: USER_ID, userName: USER_NAME, amount: amount, bonus: parseFloat(selected.getAttribute('data-bonus')),
                 method: document.getElementById('deposit-method').value, trxId: document.getElementById('deposit-trxid').value,
                 status: 'pending', timestamp: new Date().toISOString()
-            }).then(() => { alert('রিকোয়েস্ট পাঠানো হয়েছে!'); e.target.reset(); showForm(null); btn.disabled = false; });
+            }).then(() => {
+                alert('রিকোয়েস্ট সফল হয়েছে! হিস্টোরিতে চেক করুন।');
+                e.target.reset(); showForm(null); btn.disabled = false; btn.innerText = 'রিকোয়েস্ট পাঠান';
+                loadHistory(); // সাথে সাথে রিফ্রেশ
+            });
         });
 
+        // উইথড্র সাবমিট
         document.getElementById('withdraw-form-element').addEventListener('submit', e => {
             e.preventDefault();
             const btn = e.target.querySelector('button');
             const amount = parseFloat(document.getElementById('withdraw-amount').value);
+            
             db.ref('users/'+USER_ID+'/balance').once('value', s => {
                 if((s.val()||0) < amount) { alert('ব্যালেন্স নেই!'); return; }
-                btn.disabled = true;
+                btn.disabled = true; btn.innerText = 'পাঠানো হচ্ছে...';
+                
                 db.ref('withdrawals').push({
                     userId: USER_ID, userName: USER_NAME, amount: amount,
                     method: document.getElementById('withdraw-method').value, number: document.getElementById('withdraw-number').value,
                     status: 'pending', timestamp: new Date().toISOString()
-                }).then(() => { alert('উত্তোলন রিকোয়েস্ট পাঠানো হয়েছে!'); e.target.reset(); showForm(null); btn.disabled = false; });
+                }).then(() => {
+                    alert('উত্তোলন রিকোয়েস্ট সফল!');
+                    e.target.reset(); showForm(null); btn.disabled = false; btn.innerText = 'রিকোয়েস্ট পাঠান';
+                    loadHistory(); // সাথে সাথে রিফ্রেশ
+                });
             });
         });
 
