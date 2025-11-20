@@ -4,13 +4,12 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>অ্যাডমিন প্যানেল</title>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <style>
         body { font-family: 'Segoe UI', sans-serif; background-color: #f4f7f6; margin: 0; display: flex; }
         .sidebar { width: 250px; background-color: #2c3e50; color: white; height: 100vh; position: fixed; overflow-y: auto; }
         .sidebar ul { list-style: none; padding: 0; margin: 0; }
         .sidebar ul li { padding: 15px 20px; cursor: pointer; border-bottom: 1px solid #34495e; }
-        .sidebar ul li:hover, .sidebar ul li.active { background-color: #3498db; }
+        .sidebar ul li.active { background-color: #3498db; }
         .main-content { margin-left: 250px; flex-grow: 1; padding: 30px; }
         .page-section { display: none; }
         .page-section.active { display: block; }
@@ -19,7 +18,6 @@
         table { width: 100%; border-collapse: collapse; }
         th, td { border: 1px solid #ddd; padding: 10px; text-align: left; }
         th { background-color: #f8f9fa; }
-        
         .btn { padding: 5px 10px; border: none; border-radius: 4px; cursor: pointer; color: white; margin: 2px; }
         .btn-g { background: #28a745; } .btn-r { background: #dc3545; } .btn-b { background: #007bff; }
         input, textarea { padding: 8px; border: 1px solid #ccc; border-radius: 4px; }
@@ -38,7 +36,7 @@
         <ul>
             <li onclick="show('dash')" class="active">ড্যাশবোর্ড</li>
             <li onclick="show('users')">ইউজার & ব্যান</li>
-            <li onclick="show('req')">রিকোয়েস্ট (জমা/তোলা)</li>
+            <li onclick="show('req')">রিকোয়েস্ট (লোকেশন সহ)</li>
             <li onclick="show('pack')">প্যাকেজ ম্যানেজ</li>
             <li onclick="show('chat')">লাইভ চ্যাট</li>
             <li onclick="show('set')">সেটিংস</li>
@@ -48,18 +46,15 @@
     <div class="main-content">
         <div id="dash" class="page-section active">
             <h1>ড্যাশবোর্ড</h1>
-            <div class="card">
-                <h3>আজকের একটিভ ইউজার: <span id="daily-active">0</span> জন</h3>
-            </div>
+            <div class="card"><h3>আজকের একটিভ ইউজার: <span id="daily-active">0</span> জন</h3></div>
         </div>
 
         <div id="users" class="page-section">
             <h1>ইউজার ম্যানেজমেন্ট</h1>
             <div class="card">
                 <input id="search" onkeyup="filter()" placeholder="আইডি সার্চ...">
-                <button class="btn btn-b" onclick="loadUsers()">রিফ্রেশ</button>
-                <br><br>
-                <table><thead><tr><th>User</th><th>Location & IP</th><th>Balance</th><th>Stats</th><th>Action</th></tr></thead><tbody id="user-list"></tbody></table>
+                <button class="btn btn-b" onclick="loadUsers()">রিফ্রেশ</button><br><br>
+                <table><thead><tr><th>User</th><th>Loc & IP</th><th>Bal</th><th>Stats</th><th>Action</th></tr></thead><tbody id="user-list"></tbody></table>
             </div>
         </div>
 
@@ -67,33 +62,27 @@
             <h1>পেন্ডিং রিকোয়েস্ট</h1>
             <div class="card">
                 <h3>জমা</h3>
-                <table><thead><tr><th>User</th><th>Details</th><th>Amount</th><th>Action</th></tr></thead><tbody id="dep-list"></tbody></table>
+                <table><thead><tr><th>User (Loc)</th><th>Details</th><th>Amount (Bonus)</th><th>Action</th></tr></thead><tbody id="dep-list"></tbody></table>
                 <h3>তোলা</h3>
-                <table><thead><tr><th>User</th><th>Details</th><th>Amount</th><th>Action</th></tr></thead><tbody id="wid-list"></tbody></table>
+                <table><thead><tr><th>User (Loc)</th><th>Details</th><th>Amount</th><th>Action</th></tr></thead><tbody id="wid-list"></tbody></table>
             </div>
         </div>
 
         <div id="pack" class="page-section">
             <h1>প্যাকেজ ম্যানেজ</h1>
             <div class="card">
-                <input id="p-name" placeholder="প্যাকেজ নাম">
-                <input id="p-price" type="number" placeholder="দাম">
-                <input id="p-bonus" type="number" placeholder="বোনাস">
-                <button class="btn btn-g" onclick="addPack()">যোগ করুন</button>
-                <br><br>
+                <input id="p-name" placeholder="নাম"> <input id="p-price" type="number" placeholder="দাম"> <input id="p-bonus" type="number" placeholder="বোনাস">
+                <button class="btn btn-g" onclick="addPack()">যোগ করুন</button><br><br>
                 <table><thead><tr><th>Name</th><th>Price</th><th>Bonus</th><th>Action</th></tr></thead><tbody id="pack-list"></tbody></table>
             </div>
         </div>
 
         <div id="chat" class="page-section">
-            <h1>লাইভ চ্যাট সাপোর্ট</h1>
+            <h1>লাইভ চ্যাট</h1>
             <div class="card" style="display:flex; gap:20px;">
-                <div style="width:30%; border-right:1px solid #ccc;">
-                    <h4>ইউজার লিস্ট</h4>
-                    <div id="chat-users"></div>
-                </div>
+                <div style="width:30%; border-right:1px solid #ccc;" id="chat-users"></div>
                 <div style="width:70%;">
-                    <h4 id="chat-with">Select User</h4>
+                    <h4 id="chat-with">User Select</h4>
                     <div class="chat-window" id="chat-display"></div>
                     <input id="chat-msg" style="width:70%"> <button class="btn btn-b" onclick="sendChat()">Send</button>
                 </div>
@@ -103,10 +92,8 @@
         <div id="set" class="page-section">
             <h1>সেটিংস</h1>
             <div class="card">
-                <label>নোটিশ:</label><br><textarea id="notice" style="width:100%"></textarea><button class="btn btn-b" onclick="saveSet('notice')">Save</button>
-                <br><br>
-                <label>নিয়ম:</label><br><textarea id="rules" style="width:100%"></textarea><button class="btn btn-b" onclick="saveSet('rules')">Save</button>
-                <br><br>
+                <label>নোটিশ:</label><br><textarea id="notice" style="width:100%"></textarea><button class="btn btn-b" onclick="saveSet('notice')">Save</button><br><br>
+                <label>নিয়ম:</label><br><textarea id="rules" style="width:100%"></textarea><button class="btn btn-b" onclick="saveSet('rules')">Save</button><br><br>
                 <label>বিকাশ:</label><input id="bkash"> <label>নগদ:</label><input id="nagad"> <button class="btn btn-b" onclick="saveNum()">Save</button>
             </div>
         </div>
@@ -137,77 +124,21 @@
         }
         show('dash');
 
-        // ১. ইউজার ম্যানেজ ও ব্যান
-        async function loadUsers() {
-            const l = document.getElementById('user-list'); l.innerHTML='loading...';
-            const s = await db.ref('users').get();
-            l.innerHTML='';
-            let count = 0;
-            const today = new Date().toISOString().split('T')[0];
-
-            s.forEach(u => {
-                const v = u.val();
-                if(v.last_active && v.last_active.includes(today)) count++; // ডেইলি একটিভ কাউন্ট
-
-                const btnText = v.isBanned ? 'Unban' : 'Ban';
-                const btnColor = v.isBanned ? 'btn-g' : 'btn-r';
-
-                l.innerHTML += `<tr>
-                    <td>${v.name}<br><small>${u.key}</small></td>
-                    <td>${v.location||'N/A'}<br><small>${v.ip||'N/A'}</small></td>
-                    <td>${v.balance} <button onclick="editBal('${u.key}')">✏</button></td>
-                    <td>Dep: 0 | Wid: 0</td> 
-                    <td><button class="btn ${btnColor}" onclick="toggleBan('${u.key}', ${v.isBanned})">${btnText}</button></td>
-                </tr>`;
-            });
-            document.getElementById('daily-active').innerText = count;
-        }
-        function toggleBan(uid, status) {
-            if(confirm(status ? "Unban User?" : "Ban User?")) {
-                db.ref('users/'+uid).update({isBanned: !status}).then(()=>loadUsers());
-            }
-        }
-        function editBal(uid){
-            let n = prompt("New Balance:");
-            if(n) db.ref('users/'+uid).update({balance: parseFloat(n)}).then(()=>loadUsers());
-        }
-
-        // ২. প্যাকেজ ম্যানেজ
-        function loadPacks() {
-            db.ref('packages').on('value', s => {
-                const l = document.getElementById('pack-list'); l.innerHTML='';
-                s.forEach(p => {
-                    l.innerHTML += `<tr><td>${p.val().name}</td><td>${p.val().price}</td><td>${p.val().bonus}</td>
-                    <td><button class="btn btn-r" onclick="delPack('${p.key}')">Del</button></td></tr>`;
-                });
-            });
-        }
-        function addPack() {
-            const name = document.getElementById('p-name').value;
-            const price = document.getElementById('p-price').value;
-            const bonus = document.getElementById('p-bonus').value;
-            if(name && price) {
-                db.ref('packages').push({name, price:parseFloat(price), bonus:parseFloat(bonus)});
-                alert('Added');
-            }
-        }
-        function delPack(k) { if(confirm('Delete?')) db.ref('packages/'+k).remove(); }
-
-        // ৩. রিকোয়েস্ট (লোকেশন সহ)
+        // ১. রিকোয়েস্ট (লোকেশন ও আইপি সহ)
         db.ref('deposits').orderByChild('status').equalTo('pending').on('value', s => {
             const l = document.getElementById('dep-list'); l.innerHTML='';
             s.forEach(d => {
-                l.innerHTML += `<tr><td>${d.val().userName}<br>Loc: ${d.val().location||'N/A'}</td>
+                l.innerHTML += `<tr><td>${d.val().userName}<br>${d.val().location||'N/A'} <br>IP: ${d.val().ip||'N/A'}</td>
                 <td>Method: ${d.val().method}<br>Trx: ${d.val().trxId}</td>
-                <td>৳${d.val().amount}</td>
-                <td><button class="btn btn-g" onclick="proc('${d.key}','deposits',true,${d.val().amount+d.val().bonus},'${d.val().userId}')">✔</button>
+                <td>Main: ৳${d.val().amount}<br>Bonus: ৳${d.val().bonus}</td>
+                <td><button class="btn btn-g" onclick="proc('${d.key}','deposits',true,${d.val().bonus},'${d.val().userId}')">✔</button>
                 <button class="btn btn-r" onclick="proc('${d.key}','deposits',false)">✖</button></td></tr>`;
             });
         });
         db.ref('withdrawals').orderByChild('status').equalTo('pending').on('value', s => {
             const l = document.getElementById('wid-list'); l.innerHTML='';
             s.forEach(d => {
-                l.innerHTML += `<tr><td>${d.val().userName}<br>Loc: ${d.val().location||'N/A'}</td>
+                l.innerHTML += `<tr><td>${d.val().userName}<br>${d.val().location||'N/A'} <br>IP: ${d.val().ip||'N/A'}</td>
                 <td>To: ${d.val().number}<br>${d.val().method}</td>
                 <td>৳${d.val().amount}</td>
                 <td><button class="btn btn-g" onclick="proc('${d.key}','withdrawals',true,0)">✔</button>
@@ -218,18 +149,72 @@
         function proc(k, type, ok, amt, uid) {
             if(!confirm('Confirm?')) return;
             if(ok) {
-                // এপ্রুভ হলে ব্যালেন্স যোগ হবে (ডিপোজিট হলে)
                 if(type==='deposits') db.ref('users/'+uid+'/balance').transaction(c=>(c||0)+amt);
                 db.ref(type+'/'+k).update({status:'approved'});
             } else {
-                // রিজেক্ট হলে ব্যালেন্স ফেরত (উইথড্র হলে)
                 if(type==='withdrawals') db.ref('users/'+uid+'/balance').transaction(c=>(c||0)+amt);
                 db.ref(type+'/'+k).update({status:'rejected'});
             }
         }
 
-        // ৪. চ্যাট সিস্টেম
-        let currentChatUser = null;
+        // ২. ইউজার লিস্ট, সার্চ, ব্যান ও স্ট্যাটস
+        async function loadUsers() {
+            const l = document.getElementById('user-list'); l.innerHTML='Loading...';
+            const s = await db.ref('users').get();
+            const deps = await db.ref('deposits').get();
+            const wids = await db.ref('withdrawals').get();
+            
+            let userStats = {};
+            if(deps.exists()) deps.forEach(d=>{ if(d.val().status==='approved'){ if(!userStats[d.val().userId]) userStats[d.val().userId]={d:0,w:0}; userStats[d.val().userId].d++; }});
+            if(wids.exists()) wids.forEach(w=>{ if(w.val().status==='approved'){ if(!userStats[w.val().userId]) userStats[w.val().userId]={d:0,w:0}; userStats[w.val().userId].w++; }});
+
+            l.innerHTML='';
+            let activeCount = 0;
+            const today = new Date().toISOString().split('T')[0];
+
+            s.forEach(u => {
+                const v = u.val();
+                if(v.last_active && v.last_active.includes(today)) activeCount++;
+                const stats = userStats[u.key] || {d:0, w:0};
+                
+                l.innerHTML += `<tr>
+                    <td>${v.name}<br><small>${u.key}</small></td>
+                    <td>${v.location||'N/A'}<br><small>${v.ip||'N/A'}</small></td>
+                    <td>${v.balance} <button onclick="editBal('${u.key}')">✏</button></td>
+                    <td>Dep: ${stats.d} | Wid: ${stats.w}</td>
+                    <td><button class="btn ${v.isBanned?'btn-g':'btn-r'}" onclick="ban('${u.key}',${v.isBanned})">${v.isBanned?'Unban':'Ban'}</button></td>
+                </tr>`;
+            });
+            document.getElementById('daily-active').innerText = activeCount;
+        }
+        function ban(uid, state) { if(confirm('Change status?')) db.ref('users/'+uid).update({isBanned:!state}).then(()=>loadUsers()); }
+        function editBal(uid) { const n=prompt('New Balance:'); if(n) db.ref('users/'+uid).update({balance:parseFloat(n)}).then(()=>loadUsers()); }
+        function filter() {
+            const f = document.getElementById('search').value.toUpperCase();
+            const tr = document.getElementById('user-list').getElementsByTagName('tr');
+            for(let i=0; i<tr.length; i++) {
+                const td = tr[i].getElementsByTagName('td')[0];
+                tr[i].style.display = td && td.innerHTML.toUpperCase().indexOf(f)>-1 ? "" : "none";
+            }
+        }
+
+        // ৩. প্যাকেজ
+        function loadPacks() {
+            db.ref('packages').on('value', s => {
+                const l = document.getElementById('pack-list'); l.innerHTML='';
+                s.forEach(p => {
+                    l.innerHTML += `<tr><td>${p.val().name}</td><td>${p.val().price}</td><td>${p.val().bonus}</td>
+                    <td><button class="btn btn-r" onclick="if(confirm('Delete?')) db.ref('packages/${p.key}').remove()">Del</button></td></tr>`;
+                });
+            });
+        }
+        function addPack() {
+            const n=document.getElementById('p-name').value, p=document.getElementById('p-price').value, b=document.getElementById('p-bonus').value;
+            if(n&&p) db.ref('packages').push({name:n, price:parseFloat(p), bonus:parseFloat(b)});
+        }
+
+        // ৪. চ্যাট
+        let chatU = null;
         function loadChatUsers() {
             db.ref('chats').on('value', s => {
                 const l = document.getElementById('chat-users'); l.innerHTML='';
@@ -239,36 +224,26 @@
             });
         }
         function openChat(uid) {
-            currentChatUser = uid;
-            document.getElementById('chat-with').innerText = 'Chat with: ' + uid;
+            chatU = uid; document.getElementById('chat-with').innerText = 'Chat: '+uid;
             db.ref('chats/'+uid).limitToLast(20).on('value', s => {
                 const d = document.getElementById('chat-display'); d.innerHTML='';
-                s.forEach(m => {
-                    const c = m.val().sender==='admin'?'msg-a':'msg-u';
-                    d.innerHTML += `<div class="msg ${c}">${m.val().text}</div>`;
-                });
+                s.forEach(m => { d.innerHTML += `<div class="msg ${m.val().sender==='admin'?'msg-a':'msg-u'}">${m.val().text}</div>`; });
                 d.scrollTop = d.scrollHeight;
             });
         }
         function sendChat() {
-            const txt = document.getElementById('chat-msg').value;
-            if(currentChatUser && txt) {
-                db.ref('chats/'+currentChatUser).push({sender:'admin', text:txt, timestamp:new Date().toISOString()});
-                document.getElementById('chat-msg').value='';
-            }
+            const t = document.getElementById('chat-msg').value;
+            if(chatU && t) { db.ref('chats/'+chatU).push({sender:'admin', text:t, timestamp:new Date().toISOString()}); document.getElementById('chat-msg').value=''; }
         }
 
-        // সেটিংস
-        function saveSet(t) { 
-            const val = document.getElementById(t==='notice'?'notice':'rules').value;
-            db.ref('settings/'+t).set({text: val}).then(()=>alert('Saved'));
-        }
-        function saveNum() {
-            db.ref('settings/paymentNumbers').set({
-                bkash: document.getElementById('bkash').value,
-                nagad: document.getElementById('nagad').value
-            }).then(()=>alert('Saved'));
-        }
+        // ৫. সেটিংস
+        function saveSet(k) { db.ref('settings/'+k).set({text:document.getElementById(k==='notice'?'notice':'rules').value}).then(()=>alert('Saved')); }
+        function saveNum() { db.ref('settings/paymentNumbers').set({bkash:document.getElementById('bkash').value, nagad:document.getElementById('nagad').value}).then(()=>alert('Saved')); }
+        db.ref('settings').get().then(s=>{ if(s.exists()){ 
+            if(s.val().notice) document.getElementById('notice').value=s.val().notice.text;
+            if(s.val().rules) document.getElementById('rules').value=s.val().rules.text;
+            if(s.val().paymentNumbers) { document.getElementById('bkash').value=s.val().paymentNumbers.bkash; document.getElementById('nagad').value=s.val().paymentNumbers.nagad; }
+        }});
     </script>
 </body>
 </html>
