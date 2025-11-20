@@ -23,10 +23,8 @@
         .btn-reject { background-color: #dc3545; }
         .btn-blue { background-color: #007bff; }
         input, textarea { width: 100%; padding: 10px; margin: 5px 0 15px 0; border: 1px solid #ccc; border-radius: 4px; box-sizing: border-box; }
-        
-        /* নতুন: আইপি ব্যাজ */
         .ip-badge { background-color: #eef2f3; color: #555; padding: 4px; border-radius: 4px; font-family: monospace; font-size: 0.9em; display: block; margin-top: 5px; }
-        .loc-badge { font-size: 0.85em; color: #888; }
+        .loc-badge { font-size: 0.85em; color: #2980b9; font-weight: bold; }
     </style>
 </head>
 <body>
@@ -36,7 +34,8 @@
             <li class="nav-btn active" onclick="showSection('dashboard')">ড্যাশবোর্ড</li>
             <li class="nav-btn" onclick="showSection('deposits')">ডিপোজিট রিকোয়েস্ট</li>
             <li class="nav-btn" onclick="showSection('withdraws')">উত্তোলন রিকোয়েস্ট</li>
-            <li class="nav-btn" onclick="showSection('users')">ইউজার & ট্র্যাকিং</li> <li class="nav-btn" onclick="showSection('settings')">সেটিংস</li>
+            <li class="nav-btn" onclick="showSection('users')">ইউজার & ট্র্যাকিং</li>
+            <li class="nav-btn" onclick="showSection('settings')">সেটিংস</li>
         </ul>
     </div>
 
@@ -71,7 +70,8 @@
                     <thead>
                         <tr>
                             <th>নাম & আইডি</th>
-                            <th>লোকেশন & VIP IP</th> <th>ব্যালেন্স</th>
+                            <th>লোকেশন & VIP IP</th>
+                            <th>ব্যালেন্স</th>
                             <th>রেফার</th>
                             <th>মোট ডিপোজিট</th>
                             <th>মোট উত্তোলন</th>
@@ -130,7 +130,6 @@
             if(id === 'users') loadUserStats();
         }
 
-        // রিকোয়েস্ট হ্যান্ডলিং
         db.ref('deposits').orderByChild('status').equalTo('pending').on('value', s => {
             const el = document.getElementById('deposit-list'); el.innerHTML = '';
             if(!s.exists()) { el.innerHTML = '<tr><td colspan="4">নেই</td></tr>'; return; }
@@ -178,7 +177,6 @@
             });
         }
 
-        // ইউজার স্ট্যাটস (আপডেটেড)
         async function loadUserStats() {
             const tbody = document.getElementById('user-stats-body');
             tbody.innerHTML = '<tr><td colspan="7">লোড হচ্ছে...</td></tr>';
@@ -187,16 +185,7 @@
             if(!users.exists()) { tbody.innerHTML = '<tr><td colspan="7">ইউজার নেই</td></tr>'; return; }
 
             let data = {};
-            // এখানে আইপি এবং লোকেশন রিড করা হচ্ছে
-            users.forEach(u => data[u.key] = { 
-                ...u.val(), 
-                key: u.key, 
-                refs: 0, 
-                tDep: 0, 
-                tWid: 0,
-                ip: u.val().ip || 'N/A',
-                location: u.val().location || 'N/A'
-            });
+            users.forEach(u => data[u.key] = { ...u.val(), key: u.key, refs: 0, tDep: 0, tWid: 0, ip: u.val().ip || 'N/A', location: u.val().location || 'N/A' });
 
             Object.values(data).forEach(u => { if(u.referredBy && data[u.referredBy]) data[u.referredBy].refs++; });
 
@@ -207,10 +196,7 @@
             Object.values(data).reverse().forEach(u => {
                 tbody.innerHTML += `<tr>
                     <td>${u.name}<br><small>${u.key}</small></td>
-                    <td>
-                        <div class="loc-badge">📍 ${u.location}</div>
-                        <span class="ip-badge">IP: ${u.ip}</span>
-                    </td>
+                    <td><div class="loc-badge">📍 ${u.location}</div><span class="ip-badge">IP: ${u.ip}</span></td>
                     <td style="color:blue;font-weight:bold">৳${u.balance}</td>
                     <td>${u.refs}</td>
                     <td style="color:green">৳${u.tDep}</td>
@@ -233,7 +219,6 @@
             }
         }
 
-        // সেটিংস
         function saveNotice() { db.ref('settings/notice').set({text: document.getElementById('notice-input').value}).then(()=>alert('Saved')); }
         function saveRules() { db.ref('settings/rules').set({text: document.getElementById('rules-input').value}).then(()=>alert('Saved')); }
         function saveNumbers() { db.ref('settings/paymentNumbers').set({bkash: document.getElementById('bkash-num').value, nagad: document.getElementById('nagad-num').value}).then(()=>alert('Saved')); }
