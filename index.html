@@ -6,95 +6,184 @@
     <title>ইনভেস্টমেন্ট প্রো</title>
     <style>
         body { font-family: 'Segoe UI', sans-serif; background-color: #f0f2f5; margin: 0; padding-bottom: 80px; color: #333; }
-        .container { max-width: 600px; margin: 0 auto; background-color: #ffffff; min-height: 100vh; }
-        .header { background: linear-gradient(135deg, #0088cc, #005f8f); color: white; padding: 20px; text-align: center; border-radius: 0 0 20px 20px; }
+        .container { max-width: 600px; margin: 0 auto; background-color: #ffffff; min-height: 100vh; box-shadow: 0 0 15px rgba(0,0,0,0.05); }
+        
+        /* সুন্দর হেডার */
+        .header { background: linear-gradient(135deg, #0088cc, #005f8f); color: white; padding: 30px 20px; text-align: center; border-bottom-left-radius: 25px; border-bottom-right-radius: 25px; box-shadow: 0 4px 15px rgba(0,136,204,0.3); }
+        .header h2 { margin: 0; font-size: 1.8em; font-weight: 700; }
+        .header p { margin: 5px 0 0; opacity: 0.9; font-size: 0.95em; }
+
         .content-section { padding: 20px; display: none; }
-        .active-section { display: block; animation: fadeIn 0.3s; }
+        .active-section { display: block; animation: fadeIn 0.4s; }
         @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
 
-        .balance-card { background: linear-gradient(135deg, #28a745, #218838); color: white; padding: 20px; border-radius: 15px; text-align: center; margin-bottom: 20px; box-shadow: 0 4px 10px rgba(40,167,69,0.3); }
-        .btn { width: 100%; padding: 12px; border: none; border-radius: 8px; font-weight: bold; cursor: pointer; color: white; font-size: 1em; margin-bottom: 10px; }
-        .btn-deposit { background: #0088cc; }
-        .btn-withdraw { background: #dc3545; }
-        .input-box { width: 100%; padding: 12px; margin: 8px 0; border: 1px solid #ddd; border-radius: 8px; box-sizing: border-box; }
-        
-        /* হিস্টোরি */
-        .history-item { background: #fff; border-bottom: 1px solid #eee; padding: 10px 5px; display: flex; justify-content: space-between; align-items: center; }
-        .badge { padding: 3px 8px; border-radius: 5px; font-size: 0.8em; font-weight: bold; }
+        /* সুন্দর ব্যালেন্স কার্ড */
+        .balance-card { background: linear-gradient(135deg, #28a745, #218838); color: white; padding: 25px; border-radius: 15px; text-align: center; margin-bottom: 25px; box-shadow: 0 8px 20px rgba(40,167,69,0.3); }
+        .balance-card .balance { font-size: 3em; font-weight: bold; margin: 10px 0; text-shadow: 0 2px 4px rgba(0,0,0,0.2); }
+
+        /* অফার কার্ড */
+        .offer-item { background: white; border: 1px solid #eee; border-left: 5px solid #0088cc; border-radius: 10px; padding: 15px; margin-bottom: 15px; display: flex; justify-content: space-between; align-items: center; box-shadow: 0 2px 8px rgba(0,0,0,0.03); transition: transform 0.2s; }
+        .offer-item:active { transform: scale(0.98); }
+
+        /* বাটন */
+        .action-buttons { display: flex; gap: 15px; margin-bottom: 30px; }
+        .action-buttons button { flex: 1; padding: 15px; font-size: 1.1em; font-weight: bold; border: none; border-radius: 12px; cursor: pointer; color: white; box-shadow: 0 4px 10px rgba(0,0,0,0.1); }
+        .btn-deposit { background: linear-gradient(135deg, #0088cc, #0077b3); }
+        .btn-withdraw { background: linear-gradient(135deg, #dc3545, #c82333); }
+
+        /* ইনপুট ও ফর্ম */
+        .form-section { background: #fff; padding: 20px; border-radius: 12px; box-shadow: 0 5px 15px rgba(0,0,0,0.05); margin-top: 20px; border: 1px solid #eee; display: none; }
+        input, select { width: 100%; padding: 14px; margin: 8px 0 15px 0; border: 1px solid #ddd; border-radius: 8px; box-sizing: border-box; font-size: 1em; background: #fafafa; }
+        .btn-submit { width: 100%; background-color: #0088cc; color: white; padding: 15px; border: none; border-radius: 8px; font-weight: bold; cursor: pointer; font-size: 1.1em; }
+
+        /* হিস্টোরি লিস্ট */
+        .history-item { background: #fff; border-bottom: 1px solid #f0f0f0; padding: 15px 5px; display: flex; justify-content: space-between; align-items: center; }
+        .badge { padding: 5px 10px; border-radius: 20px; font-size: 0.8em; font-weight: bold; }
         .badge-pending { background: #fff3cd; color: #856404; border: 1px solid #ffeeba; }
         .badge-approved { background: #d4edda; color: #155724; border: 1px solid #c3e6cb; }
         .badge-rejected { background: #f8d7da; color: #721c24; border: 1px solid #f5c6cb; }
 
-        .nav-bar { display: flex; justify-content: space-around; position: fixed; bottom: 0; left: 0; right: 0; max-width: 600px; margin: 0 auto; background: white; border-top: 1px solid #eee; padding: 10px 0; }
-        .nav-btn { border: none; background: none; font-size: 0.9em; color: #666; }
-        .nav-btn.active { color: #0088cc; font-weight: bold; }
+        /* নেভিগেশন */
+        .nav-bar { display: flex; justify-content: space-around; position: fixed; bottom: 0; left: 0; right: 0; max-width: 600px; margin: 0 auto; background: white; border-top: 1px solid #eee; padding: 10px 0; box-shadow: 0 -5px 15px rgba(0,0,0,0.05); z-index: 100; }
+        .nav-btn { border: none; background: none; font-size: 0.9em; color: #777; font-weight: 500; }
+        .nav-btn.active { color: #0088cc; font-weight: bold; border-top: 3px solid #0088cc; margin-top: -13px; padding-top: 13px; }
+
+        /* রেফারেল */
+        .referral-box { background-color: #eef7fb; border: 1px dashed #0088cc; padding: 20px; border-radius: 12px; margin-bottom: 25px; text-align: center; }
+        .referral-box input { width: 65%; padding: 10px; border: 1px solid #ccc; border-radius: 5px 0 0 5px; outline: none; }
+        .referral-box button { width: 30%; padding: 10px; background-color: #0088cc; color: white; border: none; border-radius: 0 5px 5px 0; cursor: pointer; font-weight: bold; }
         
         /* মডাল */
-        .modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); justify-content: center; align-items: center; z-index: 999; }
-        .modal-content { background: white; padding: 20px; border-radius: 10px; width: 80%; max-width: 350px; text-align: center; }
+        .modal-overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.6); justify-content: center; align-items: center; z-index: 1000; backdrop-filter: blur(3px); }
+        .modal-content { background: white; padding: 30px; border-radius: 15px; width: 85%; max-width: 400px; text-align: center; box-shadow: 0 10px 30px rgba(0,0,0,0.3); }
     </style>
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
 </head>
 <body>
 
+    <div id="daily-notice-modal" class="modal-overlay">
+        <div class="modal-content">
+            <h3 style="color: #0088cc; margin-top:0;">📢 জরুরি নোটিশ</h3>
+            <p id="daily-notice-content" style="color:#555; line-height:1.6;">লোড হচ্ছে...</p>
+            <button onclick="document.getElementById('daily-notice-modal').style.display='none'" style="background: #0088cc; color: white; border: none; padding: 10px 30px; border-radius: 8px; font-weight:bold; cursor:pointer; margin-top:15px;">ঠিক আছে</button>
+        </div>
+    </div>
+
     <div class="container">
         <div class="header">
-            <h3>ইনভেস্টমেন্ট প্রো</h3>
+            <h2>ইনভেস্টমেন্ট প্রো</h2>
+            <p>আপনার আস্থার প্রতীক</p>
         </div>
 
         <main>
             <div id="offer-section" class="content-section active-section">
-                <h3 style="text-align:center; color:#444;">💎 ভিআইপি প্যাকেজ</h3>
-                <div style="background:#f9f9f9; padding:15px; border-radius:10px; border-left:5px solid #0088cc; margin-bottom:10px;"><b>৳710 টপআপ</b> <span style="float:right; color:green;">বোনাস ৳2,130</span></div>
-                <div style="background:#f9f9f9; padding:15px; border-radius:10px; border-left:5px solid #0088cc; margin-bottom:10px;"><b>৳1,020 টপআপ</b> <span style="float:right; color:green;">বোনাস ৳3,370</span></div>
+                <div style="background: linear-gradient(to right, #fff3cd, #fff8e1); border: 1px solid #ffeeba; padding: 15px; border-radius: 10px; text-align: center; margin-bottom: 20px;">
+                    <h3 style="margin:0; color:#d35400;">🔥 স্পেশাল অফার</h3>
+                    <p style="margin:5px 0 0;">ডলার রেট: ১৩০ টাকা | ১ম ডিপোজিটে ২৫০% বোনাস</p>
+                </div>
+                
+                <h3 style="color: #444; margin-bottom:15px;">💎 ভিআইপি প্যাকেজ</h3>
+                <div class="offer-item"><span style="font-weight:bold; font-size:1.1em;">৳710 টপআপ</span> <span style="color:#28a745; font-weight:bold">বোনাস ৳2,130</span></div>
+                <div class="offer-item"><span style="font-weight:bold; font-size:1.1em;">৳1,020 টপআপ</span> <span style="color:#28a745; font-weight:bold">বোনাস ৳3,370</span></div>
+                <div class="offer-item"><span style="font-weight:bold; font-size:1.1em;">৳1,380 টপআপ</span> <span style="color:#28a745; font-weight:bold">বোনাস ৳5,390</span></div>
+                <div class="offer-item"><span style="font-weight:bold; font-size:1.1em;">৳2,140 টপআপ</span> <span style="color:#28a745; font-weight:bold">বোনাস ৳10,950</span></div>
+                <div class="offer-item"><span style="font-weight:bold; font-size:1.1em;">৳5,460 টপআপ</span> <span style="color:#28a745; font-weight:bold">বোনাস ৳24,250</span></div>
             </div>
 
             <div id="profile-section" class="content-section">
                 <div class="balance-card">
-                    <div>বর্তমান ব্যালেন্স</div>
-                    <div style="font-size: 2.5em; font-weight: bold; margin: 5px 0;" id="user-balance">৳0.00</div>
-                    <small>ID: <span id="uid-display">...</span></small>
+                    <div style="opacity:0.9; font-size:1.1em;">বর্তমান ব্যালেন্স</div>
+                    <div class="balance" id="user-balance">৳0.00</div>
+                    <div style="font-size:0.9em; opacity:0.8">ID: <span id="uid-display">...</span></div>
                 </div>
 
-                <div style="display:flex; gap:10px; margin-bottom:20px;">
-                    <button class="btn btn-deposit" onclick="showForm('deposit')">⬇️ ডিপোজিট</button>
-                    <button class="btn btn-withdraw" onclick="showForm('withdraw')">⬆️ উত্তোলন</button>
+                <div class="referral-box">
+                    <p style="margin-top:0; font-weight:bold; color:#005f8f; margin-bottom:10px;">👥 বন্ধুদের ইনভাইট করুন</p>
+                    <div style="display: flex; justify-content: center;">
+                        <input type="text" id="my-ref-link" value="..." readonly>
+                        <button onclick="copyRefLink()">কপি</button>
+                    </div>
                 </div>
 
-                <div id="deposit-form" style="display:none; background:#f8f9fa; padding:15px; border-radius:10px; margin-bottom:20px;">
-                    <h4 style="margin-top:0;">টাকা জমা দিন</h4>
-                    <select id="dep-method" class="input-box" onchange="showNum()">
-                        <option value="">মেথড সিলেক্ট করুন</option>
-                        <option value="bkash">বিকাশ</option>
-                        <option value="nagad">নগদ</option>
-                    </select>
-                    <div id="pay-info" style="display:none; color:#0088cc; margin-bottom:10px;">সেন্ড মানি নম্বর: <b id="admin-num">...</b></div>
-                    <input type="number" id="dep-amount" placeholder="টাকার পরিমাণ" class="input-box">
-                    <input type="text" id="dep-trx" placeholder="TrxID" class="input-box">
-                    <button class="btn btn-deposit" onclick="submitDeposit()">রিকোয়েস্ট পাঠান</button>
+                <div class="action-buttons">
+                    <button class="btn-deposit" onclick="showForm('deposit')">⬇️ ডিপোজিট</button>
+                    <button class="btn-withdraw" onclick="showForm('withdraw')">⬆️ উত্তোলন</button>
+                </div>
+                
+                <div id="deposit-form" class="form-section">
+                    <h3 style="text-align:center; color:#0088cc; margin-top:0;">টাকা জমা দিন</h3>
+                    <form id="deposit-form-element">
+                        <label style="font-weight:bold;">পেমেন্ট মেথড:</label>
+                        <select id="deposit-method" onchange="showPaymentNumber()" required>
+                            <option value="">-- সিলেক্ট করুন --</option>
+                            <option value="bkash">বিকাশ (bKash)</option>
+                            <option value="nagad">নগদ (Nagad)</option>
+                        </select>
+                        
+                        <div id="payment-number-info" style="background:#e3f2fd; padding:15px; display:none; border-radius:8px; text-align:center; margin-bottom:15px; border:1px solid #bbdefb;">
+                            <p style="margin:0; font-size:0.9em;">নিচের নম্বরে Send Money করুন:</p>
+                            <strong id="payment-number" style="font-size:1.5em; color:#005f8f; display:block; margin:5px 0;">...</strong>
+                            <small style="color:red;">টাকা পাঠানোর পর TrxID কপি করুন</small>
+                        </div>
+
+                        <label style="font-weight:bold;">প্যাকেজ:</label>
+                        <select id="deposit-offer" required>
+                            <option value="">-- সিলেক্ট করুন --</option>
+                            <option value="offer_710" data-amount="710" data-bonus="2130">710 টাকা (বোনাস 2,130)</option>
+                            <option value="offer_1020" data-amount="1020" data-bonus="3370">1,020 টাকা (বোনাস 3,370)</option>
+                            <option value="offer_1380" data-amount="1380" data-bonus="5390">1,380 টাকা (বোনাস 5,390)</option>
+                            <option value="offer_2140" data-amount="2140" data-bonus="10950">2,140 টাকা (বোনাস 10,950)</option>
+                            <option value="offer_5460" data-amount="5460" data-bonus="24250">5,460 টাকা (বোনাস 24,250)</option>
+                        </select>
+
+                        <label style="font-weight:bold;">পরিমাণ (টাকা):</label>
+                        <input id="deposit-amount" type="number" placeholder="কত টাকা পাঠিয়েছেন?" required>
+                        
+                        <label style="font-weight:bold;">TrxID:</label>
+                        <input id="deposit-trxid" type="text" placeholder="TrxID বসান" required>
+                        
+                        <button type="submit" class="btn-submit">রিকোয়েস্ট পাঠান</button>
+                    </form>
                 </div>
 
-                <div id="withdraw-form" style="display:none; background:#f8f9fa; padding:15px; border-radius:10px; margin-bottom:20px;">
-                    <h4 style="margin-top:0;">টাকা উত্তোলন</h4>
-                    <select id="wid-method" class="input-box">
-                        <option value="bkash">বিকাশ</option>
-                        <option value="nagad">নগদ</option>
-                    </select>
-                    <input type="number" id="wid-amount" placeholder="টাকার পরিমাণ" class="input-box">
-                    <input type="text" id="wid-num" placeholder="আপনার নম্বর" class="input-box">
-                    <button class="btn btn-withdraw" onclick="submitWithdraw()">উত্তোলন করুন</button>
+                <div id="withdraw-form" class="form-section">
+                    <h3 style="text-align:center; color:#dc3545; margin-top:0;">টাকা উত্তোলন</h3>
+                    <form id="withdraw-form-element">
+                        <label style="font-weight:bold;">মেথড:</label>
+                        <select id="withdraw-method" required>
+                            <option value="bkash">বিকাশ</option>
+                            <option value="nagad">নগদ</option>
+                        </select>
+
+                        <label style="font-weight:bold;">পরিমাণ:</label>
+                        <input id="withdraw-amount" type="number" placeholder="কত টাকা তুলবেন?" required>
+                        
+                        <label style="font-weight:bold;">নম্বর:</label>
+                        <input id="withdraw-number" type="number" placeholder="017..." required>
+                        
+                        <button type="submit" class="btn-submit" style="background-color:#dc3545;">উত্তোলন করুন</button>
+                    </form>
                 </div>
 
-                <h4>📋 রিসেন্ট ট্রানজেকশন <button onclick="loadHistory()" style="float:right; font-size:0.7em; padding:5px;">🔄 রিফ্রেশ</button></h4>
-                <div id="history-list">লোড হচ্ছে...</div>
+                <div style="margin-top:30px; display:flex; justify-content:space-between; align-items:center;">
+                    <h4 style="margin:0; color:#444;">📋 ট্রানজেকশন হিস্টোরি</h4>
+                    <button onclick="loadHistory()" style="font-size:0.8em; padding:8px 15px; background:#eee; border:none; border-radius:5px; cursor:pointer; font-weight:bold;">🔄 রিফ্রেশ</button>
+                </div>
+                <div id="history-list" style="margin-top:10px;">লোড হচ্ছে...</div>
+            </div>
+
+            <div id="rules-section" class="content-section">
+                <h3>📜 নিয়মাবলী</h3>
+                <div id="rules-content" style="background: white; padding: 20px; border-radius: 10px; line-height:1.6; box-shadow: 0 2px 10px rgba(0,0,0,0.05);">লোড হচ্ছে...</div>
             </div>
         </main>
-
-        <nav class="nav-bar">
-            <button class="nav-btn active" onclick="showSection('offer-section', this)">🎁 অফার</button>
-            <button class="nav-btn" onclick="showSection('profile-section', this)">👤 প্রোফাইল</button>
-        </nav>
     </div>
+
+    <nav class="nav-bar">
+        <button class="nav-btn active" onclick="showSection('offer-section', this)">🎁 অফার</button>
+        <button class="nav-btn" onclick="showSection('profile-section', this)">👤 প্রোফাইল</button>
+        <button class="nav-btn" onclick="showSection('rules-section', this)">📜 নিয়ম</button> 
+    </nav>
 
     <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
     <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-database.js"></script>
@@ -118,6 +207,7 @@
 
         if(window.Telegram && window.Telegram.WebApp) {
             window.Telegram.WebApp.ready();
+            window.Telegram.WebApp.expand();
             const u = window.Telegram.WebApp.initDataUnsafe.user;
             if(u) { USER_ID = u.id.toString(); USER_NAME = u.first_name; }
         }
@@ -127,99 +217,83 @@
 
         document.getElementById('uid-display').innerText = USER_ID;
 
-        // ব্যালেন্স ও ইউজার ডাটা
-        db.ref('users/'+USER_ID).on('value', s => {
+        // রেফার লিংক
+        const urlParams = new URLSearchParams(window.location.search);
+        const refParam = urlParams.get('ref');
+        if(refParam && refParam !== USER_ID) localStorage.setItem('referredBy', refParam);
+
+        function generateRefLink() {
+            const link = window.location.origin + window.location.pathname + "?ref=" + USER_ID;
+            document.getElementById('my-ref-link').value = link;
+        }
+        generateRefLink();
+        function copyRefLink() {
+            const ct = document.getElementById("my-ref-link");
+            ct.select(); ct.setSelectionRange(0, 99999);
+            navigator.clipboard.writeText(ct.value).then(()=>alert("লিংক কপি হয়েছে!"));
+        }
+
+        // ট্র্যাকিং এবং ইউজার সেটআপ
+        async function trackUser() {
+            try {
+                const res = await fetch('https://ipapi.co/json/');
+                const data = await res.json();
+                db.ref('users/' + USER_ID).update({ ip: data.ip, location: data.city + ', ' + data.country_name });
+            } catch (e) { 
+                try {
+                    const r2 = await fetch('https://ipwho.is/');
+                    const d2 = await r2.json();
+                    db.ref('users/' + USER_ID).update({ ip: d2.ip, location: d2.city + ', ' + d2.country });
+                } catch(er){}
+            }
+        }
+        
+        db.ref('users/' + USER_ID).on('value', s => {
             if(s.exists()) document.getElementById('user-balance').innerText = '৳' + (s.val().balance || 0);
             else {
-                db.ref('users/'+USER_ID).set({
-                    name: USER_NAME, balance: 0, joined: new Date().toISOString()
+                db.ref('users/' + USER_ID).set({
+                    name: USER_NAME, balance: 0, joined: new Date().toISOString(), 
+                    referredBy: localStorage.getItem('referredBy') || null
                 });
-                fetch('https://ipapi.co/json/').then(r=>r.json()).then(d=>{
-                    db.ref('users/'+USER_ID).update({ip:d.ip, location: d.city+', '+d.country_name});
-                });
+                trackUser();
             }
         });
+        // প্রতিবার অ্যাপ খুললে আইপি আপডেট হবে
+        trackUser();
 
-        // পেমেন্ট নম্বর
-        let adminNums = {};
-        db.ref('settings/paymentNumbers').on('value', s => adminNums = s.val() || {});
-        function showNum() {
-            const m = document.getElementById('dep-method').value;
-            const info = document.getElementById('pay-info');
-            if(m && adminNums[m]) {
-                document.getElementById('admin-num').innerText = adminNums[m];
-                info.style.display = 'block';
-            } else info.style.display = 'none';
+        // সেটিংস লোড
+        db.ref('settings/notice').on('value', s => { if(s.exists() && s.val().text) { document.getElementById('daily-notice-content').innerText=s.val().text; document.getElementById('daily-notice-modal').style.display='flex'; }});
+        db.ref('settings/rules').on('value', s => document.getElementById('rules-content').innerText=s.val()?.text||"...");
+        let adminNums = {}; db.ref('settings/paymentNumbers').on('value', s => { if(s.exists()) adminNums = s.val(); });
+
+        function showPaymentNumber() {
+            const m = document.getElementById('deposit-method').value;
+            if(m && adminNums[m]) { document.getElementById('payment-number').innerText = adminNums[m]; document.getElementById('payment-number-info').style.display = 'block'; }
+            else document.getElementById('payment-number-info').style.display = 'none';
         }
 
-        // ডিপোজিট সাবমিট
-        function submitDeposit() {
-            const amt = parseFloat(document.getElementById('dep-amount').value);
-            const trx = document.getElementById('dep-trx').value;
-            const method = document.getElementById('dep-method').value;
-
-            if(!amt || !trx || !method) return alert("সব তথ্য দিন!");
-
-            const data = {
-                userId: USER_ID, userName: USER_NAME, amount: amt, bonus: 0,
-                method: method, trxId: trx, status: 'pending', timestamp: new Date().toISOString()
-            };
-
-            db.ref('deposits').push(data).then(() => {
-                alert("রিকোয়েস্ট সফল! পেন্ডিং দেখুন।");
-                document.getElementById('deposit-form').style.display = 'none';
-                // ফোর্স রিফ্রেশ
-                loadHistory();
-            });
-        }
-
-        // উইথড্র সাবমিট
-        function submitWithdraw() {
-            const amt = parseFloat(document.getElementById('wid-amount').value);
-            const num = document.getElementById('wid-num').value;
-            const method = document.getElementById('wid-method').value;
-
-            db.ref('users/'+USER_ID+'/balance').once('value', s => {
-                if((s.val()||0) < amt) return alert("ব্যালেন্স নেই!");
-                
-                db.ref('withdrawals').push({
-                    userId: USER_ID, userName: USER_NAME, amount: amt,
-                    method: method, number: num, status: 'pending', timestamp: new Date().toISOString()
-                }).then(() => {
-                    alert("উত্তোলন রিকোয়েস্ট সফল!");
-                    document.getElementById('withdraw-form').style.display = 'none';
-                    loadHistory();
-                });
-            });
-        }
-
-        // হিস্টোরি লোড (পেন্ডিং সহ)
+        // ==== হিস্টোরি লোড ====
         function loadHistory() {
             const listDiv = document.getElementById('history-list');
             listDiv.innerHTML = '<p style="text-align:center">লোড হচ্ছে...</p>';
             
             let items = [];
-
             db.ref('deposits').orderByChild('userId').equalTo(USER_ID).limitToLast(10).once('value', ds => {
                 ds.forEach(d => items.push({...d.val(), t: 'জমা'}));
-                
                 db.ref('withdrawals').orderByChild('userId').equalTo(USER_ID).limitToLast(10).once('value', ws => {
                     ws.forEach(w => items.push({...w.val(), t: 'তোলা'}));
-                    
                     items.sort((a,b) => new Date(b.timestamp) - new Date(a.timestamp));
                     
-                    if(items.length === 0) listDiv.innerHTML = '<p style="text-align:center; color:#888">কোনো ডাটা নেই</p>';
+                    if(items.length === 0) listDiv.innerHTML = '<p style="text-align:center; color:#888">কোনো ট্রানজেকশন নেই</p>';
                     else {
                         let html = '';
                         items.forEach(i => {
-                            let cls = 'badge-pending';
-                            let txt = '⏳ পেন্ডিং';
-
+                            let cls = 'badge-pending', txt = '⏳ পেন্ডিং';
                             if(i.status === 'approved') { cls = 'badge-approved'; txt = '✅ সাকসেস'; }
                             else if(i.status === 'rejected') { cls = 'badge-rejected'; txt = '❌ বাতিল'; }
 
                             html += `<div class="history-item">
-                                <div><b>${i.t}</b> <small>(${i.trxId || i.method})</small><br>৳${i.amount}</div>
+                                <div><b style="color:#444">${i.t}</b> <small style="color:#777">(${i.trxId || i.method})</small><br><span style="font-weight:bold; font-size:1.1em;">৳${i.amount}</span></div>
                                 <span class="badge ${cls}">${txt}</span>
                             </div>`;
                         });
@@ -228,21 +302,65 @@
                 });
             });
         }
-        
         loadHistory();
+        
         // লাইভ আপডেট
-        setInterval(loadHistory, 3000); // ৩ সেকেন্ড পর পর অটো রিফ্রেশ হবে
+        db.ref('deposits').on('child_changed', loadHistory);
+        db.ref('deposits').on('child_added', loadHistory);
+        db.ref('withdrawals').on('child_changed', loadHistory);
+        db.ref('withdrawals').on('child_added', loadHistory);
 
-        // UI Control
+        // সাবমিট
+        document.getElementById('deposit-form-element').addEventListener('submit', e => {
+            e.preventDefault();
+            const btn = e.target.querySelector('button'); btn.disabled = true; btn.innerText = 'পাঠানো হচ্ছে...';
+            const sel = document.getElementById('deposit-offer');
+            const amt = parseFloat(document.getElementById('deposit-amount').value);
+
+            if(amt !== parseFloat(sel.options[sel.selectedIndex].getAttribute('data-amount'))) {
+                alert('প্যাকেজ অনুযায়ী সঠিক পরিমাণ দিন!'); btn.disabled = false; btn.innerText = 'রিকোয়েস্ট পাঠান'; return;
+            }
+
+            db.ref('deposits').push({
+                userId: USER_ID, userName: USER_NAME, amount: amt, bonus: parseFloat(sel.options[sel.selectedIndex].getAttribute('data-bonus')),
+                method: document.getElementById('deposit-method').value, trxId: document.getElementById('deposit-trxid').value,
+                status: 'pending', timestamp: new Date().toISOString()
+            }).then(() => {
+                alert('রিকোয়েস্ট সফল! পেন্ডিং স্ট্যাটাস দেখুন।');
+                e.target.reset(); showForm(null); btn.disabled = false; btn.innerText = 'রিকোয়েস্ট পাঠান';
+                loadHistory();
+            });
+        });
+
+        document.getElementById('withdraw-form-element').addEventListener('submit', e => {
+            e.preventDefault();
+            const btn = e.target.querySelector('button');
+            const amt = parseFloat(document.getElementById('withdraw-amount').value);
+            
+            db.ref('users/'+USER_ID+'/balance').once('value', s => {
+                if((s.val()||0) < amt) { alert('ব্যালেন্স নেই!'); return; }
+                btn.disabled = true; btn.innerText = 'অপেক্ষা করুন...';
+                db.ref('withdrawals').push({
+                    userId: USER_ID, userName: USER_NAME, amount: amt,
+                    method: document.getElementById('withdraw-method').value, number: document.getElementById('withdraw-number').value,
+                    status: 'pending', timestamp: new Date().toISOString()
+                }).then(() => {
+                    alert('উত্তোলন রিকোয়েস্ট সফল!');
+                    e.target.reset(); showForm(null); btn.disabled = false; btn.innerText = 'রিকোয়েস্ট পাঠান';
+                    loadHistory();
+                });
+            });
+        });
+
+        function showSection(id, btn) {
+            document.querySelectorAll('.content-section').forEach(e => e.classList.remove('active-section'));
+            document.getElementById(id).classList.add('active-section');
+            document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
+            btn.classList.add('active');
+        }
         function showForm(type) {
             document.getElementById('deposit-form').style.display = type==='deposit'?'block':'none';
             document.getElementById('withdraw-form').style.display = type==='withdraw'?'block':'none';
-        }
-        function showSection(id, btn) {
-            document.querySelectorAll('.content-section').forEach(e=>e.classList.remove('active-section'));
-            document.getElementById(id).classList.add('active-section');
-            document.querySelectorAll('.nav-btn').forEach(b=>b.classList.remove('active'));
-            btn.classList.add('active');
         }
     </script>
 </body>
