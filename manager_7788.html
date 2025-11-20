@@ -3,122 +3,117 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>অ্যাডমিন প্যানেল - ট্র্যাকিং প্রো</title>
+    <title>অ্যাডমিন প্যানেল</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <style>
         body { font-family: 'Segoe UI', sans-serif; background-color: #f4f7f6; margin: 0; display: flex; }
         .sidebar { width: 250px; background-color: #2c3e50; color: white; height: 100vh; position: fixed; overflow-y: auto; }
-        .sidebar h2 { text-align: center; padding: 20px 0; border-bottom: 1px solid #34495e; margin: 0; }
         .sidebar ul { list-style: none; padding: 0; margin: 0; }
-        .sidebar ul li { padding: 15px 25px; cursor: pointer; border-bottom: 1px solid #34495e; transition: 0.3s; }
+        .sidebar ul li { padding: 15px 20px; cursor: pointer; border-bottom: 1px solid #34495e; }
         .sidebar ul li:hover, .sidebar ul li.active { background-color: #3498db; }
         .main-content { margin-left: 250px; flex-grow: 1; padding: 30px; }
         .page-section { display: none; }
-        .page-section.active { display: block; animation: fadeIn 0.5s; }
-        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+        .page-section.active { display: block; }
         
-        .data-table { background: white; padding: 20px; border-radius: 8px; box-shadow: 0 2px 5px rgba(0,0,0,0.1); overflow-x: auto; margin-bottom: 20px; }
-        table { width: 100%; border-collapse: collapse; min-width: 600px; }
-        th, td { border: 1px solid #ddd; padding: 12px; text-align: left; }
-        th { background-color: #f8f9fa; font-weight: 600; color: #444; }
+        .card { background: white; padding: 20px; border-radius: 8px; box-shadow: 0 2px 5px rgba(0,0,0,0.1); margin-bottom: 20px; }
+        table { width: 100%; border-collapse: collapse; }
+        th, td { border: 1px solid #ddd; padding: 10px; text-align: left; }
+        th { background-color: #f8f9fa; }
         
-        .btn { padding: 6px 12px; border: none; border-radius: 4px; cursor: pointer; color: white; margin: 2px; font-size: 0.9em; }
-        .btn-approve { background-color: #28a745; }
-        .btn-reject { background-color: #dc3545; }
-        .btn-blue { background-color: #007bff; }
+        .btn { padding: 5px 10px; border: none; border-radius: 4px; cursor: pointer; color: white; margin: 2px; }
+        .btn-g { background: #28a745; } .btn-r { background: #dc3545; } .btn-b { background: #007bff; }
+        input, textarea { padding: 8px; border: 1px solid #ccc; border-radius: 4px; }
         
-        input, textarea { width: 100%; padding: 10px; margin: 5px 0 15px 0; border: 1px solid #ccc; border-radius: 4px; box-sizing: border-box; }
-        
-        /* লোকেশন ও আইপি ব্যাজ ডিজাইন */
-        .loc-badge { font-weight: bold; color: #d35400; font-size: 0.9em; display: block; margin-bottom: 4px; }
-        .ip-badge { background-color: #e8f6f3; color: #16a085; padding: 3px 6px; border: 1px solid #16a085; border-radius: 4px; font-family: monospace; font-size: 0.85em; }
-        .edit-box { display: flex; gap: 5px; }
-        .edit-box input { width: 80px; margin: 0; }
+        /* চ্যাট */
+        .chat-window { border: 1px solid #ccc; height: 300px; overflow-y: auto; padding: 10px; margin-bottom: 10px; background: #f9f9f9; }
+        .msg { padding: 5px 10px; margin: 5px; border-radius: 10px; display: inline-block; clear: both; }
+        .msg-u { background: #e1f5fe; float: left; }
+        .msg-a { background: #007bff; color: white; float: right; }
     </style>
 </head>
 <body>
 
     <div class="sidebar">
-        <h2>অ্যাডমিন প্যানেল</h2>
+        <h3 style="text-align:center;">অ্যাডমিন</h3>
         <ul>
-            <li class="nav-btn active" onclick="showSection('dashboard')">ড্যাশবোর্ড</li>
-            <li class="nav-btn" onclick="showSection('users')">ইউজার & লোকেশন</li> <li class="nav-btn" onclick="showSection('deposits')">পেন্ডিং ডিপোজিট</li>
-            <li class="nav-btn" onclick="showSection('withdraws')">পেন্ডিং উত্তোলন</li>
-            <li class="nav-btn" onclick="showSection('history')">সকল হিস্টোরি</li>
-            <li class="nav-btn" onclick="showSection('settings')">সেটিংস</li>
+            <li onclick="show('dash')" class="active">ড্যাশবোর্ড</li>
+            <li onclick="show('users')">ইউজার & ব্যান</li>
+            <li onclick="show('req')">রিকোয়েস্ট (জমা/তোলা)</li>
+            <li onclick="show('pack')">প্যাকেজ ম্যানেজ</li>
+            <li onclick="show('chat')">লাইভ চ্যাট</li>
+            <li onclick="show('set')">সেটিংস</li>
         </ul>
     </div>
 
     <div class="main-content">
-
-        <div id="dashboard" class="page-section active">
+        <div id="dash" class="page-section active">
             <h1>ড্যাশবোর্ড</h1>
-            <div class="data-table">
-                <h3>সার্ভার স্ট্যাটাস</h3>
-                <p>কানেকশন: <strong id="firebase-status" style="color:orange">চেক করা হচ্ছে...</strong></p>
+            <div class="card">
+                <h3>আজকের একটিভ ইউজার: <span id="daily-active">0</span> জন</h3>
             </div>
         </div>
 
         <div id="users" class="page-section">
-            <h1>👥 ইউজার লোকেশন & ট্র্যাকিং</h1>
-            <div class="data-table">
-                <div style="display:flex; justify-content:space-between; margin-bottom:15px;">
-                    <button class="btn btn-blue" onclick="loadAllUserStats()">🔄 রিফ্রেশ ডাটা</button>
-                    <input type="text" id="search-box" onkeyup="filterUsers()" placeholder="নাম বা আইডি দিয়ে খুঁজুন..." style="width:250px; margin:0;">
+            <h1>ইউজার ম্যানেজমেন্ট</h1>
+            <div class="card">
+                <input id="search" onkeyup="filter()" placeholder="আইডি সার্চ...">
+                <button class="btn btn-b" onclick="loadUsers()">রিফ্রেশ</button>
+                <br><br>
+                <table><thead><tr><th>User</th><th>Location & IP</th><th>Balance</th><th>Stats</th><th>Action</th></tr></thead><tbody id="user-list"></tbody></table>
+            </div>
+        </div>
+
+        <div id="req" class="page-section">
+            <h1>পেন্ডিং রিকোয়েস্ট</h1>
+            <div class="card">
+                <h3>জমা</h3>
+                <table><thead><tr><th>User</th><th>Details</th><th>Amount</th><th>Action</th></tr></thead><tbody id="dep-list"></tbody></table>
+                <h3>তোলা</h3>
+                <table><thead><tr><th>User</th><th>Details</th><th>Amount</th><th>Action</th></tr></thead><tbody id="wid-list"></tbody></table>
+            </div>
+        </div>
+
+        <div id="pack" class="page-section">
+            <h1>প্যাকেজ ম্যানেজ</h1>
+            <div class="card">
+                <input id="p-name" placeholder="প্যাকেজ নাম">
+                <input id="p-price" type="number" placeholder="দাম">
+                <input id="p-bonus" type="number" placeholder="বোনাস">
+                <button class="btn btn-g" onclick="addPack()">যোগ করুন</button>
+                <br><br>
+                <table><thead><tr><th>Name</th><th>Price</th><th>Bonus</th><th>Action</th></tr></thead><tbody id="pack-list"></tbody></table>
+            </div>
+        </div>
+
+        <div id="chat" class="page-section">
+            <h1>লাইভ চ্যাট সাপোর্ট</h1>
+            <div class="card" style="display:flex; gap:20px;">
+                <div style="width:30%; border-right:1px solid #ccc;">
+                    <h4>ইউজার লিস্ট</h4>
+                    <div id="chat-users"></div>
                 </div>
-                <table>
-                    <thead>
-                        <tr>
-                            <th>নাম & আইডি</th>
-                            <th>লোকেশন & VIP IP</th> <th>ব্যালেন্স</th>
-                            <th>মোট জমা/তোলা</th>
-                            <th>একশন</th>
-                        </tr>
-                    </thead>
-                    <tbody id="user-table-body">
-                        <tr><td colspan="5">ডাটা লোড করতে রিফ্রেশ বাটনে ক্লিক করুন...</td></tr>
-                    </tbody>
-                </table>
+                <div style="width:70%;">
+                    <h4 id="chat-with">Select User</h4>
+                    <div class="chat-window" id="chat-display"></div>
+                    <input id="chat-msg" style="width:70%"> <button class="btn btn-b" onclick="sendChat()">Send</button>
+                </div>
             </div>
         </div>
 
-        <div id="deposits" class="page-section">
-            <h1>🟡 পেন্ডিং ডিপোজিট</h1>
-            <div class="data-table">
-                <table><thead><tr><th>ইউজার</th><th>পরিমাণ</th><th>মেথড</th><th>অ্যাকশন</th></tr></thead><tbody id="deposit-list"></tbody></table>
-            </div>
-        </div>
-
-        <div id="withdraws" class="page-section">
-            <h1>⏳ পেন্ডিং উত্তোলন</h1>
-            <div class="data-table">
-                <table><thead><tr><th>ইউজার</th><th>পরিমাণ</th><th>নম্বর</th><th>অ্যাকশন</th></tr></thead><tbody id="withdraw-list"></tbody></table>
-            </div>
-        </div>
-
-        <div id="history" class="page-section">
-            <h1>📜 সফল লেনদেন হিস্টোরি</h1>
-            <div class="data-table">
-                <button class="btn btn-blue" onclick="loadAllHistory()">🔄 হিস্টোরি রিফ্রেশ</button>
-                <br><br>
-                <table><thead><tr><th>ইউজার</th><th>ধরন</th><th>পরিমাণ</th><th>স্ট্যাটাস</th></tr></thead><tbody id="history-list"></tbody></table>
-            </div>
-        </div>
-
-        <div id="settings" class="page-section">
+        <div id="set" class="page-section">
             <h1>সেটিংস</h1>
-            <div class="data-table">
-                <label>নোটিশ:</label> <input id="notice-input"> <button class="btn btn-blue" onclick="saveNotice()">Save</button>
+            <div class="card">
+                <label>নোটিশ:</label><br><textarea id="notice" style="width:100%"></textarea><button class="btn btn-b" onclick="saveSet('notice')">Save</button>
                 <br><br>
-                <label>নিয়ম:</label> <textarea id="rules-input"></textarea> <button class="btn btn-blue" onclick="saveRules()">Save</button>
+                <label>নিয়ম:</label><br><textarea id="rules" style="width:100%"></textarea><button class="btn btn-b" onclick="saveSet('rules')">Save</button>
                 <br><br>
-                <label>বিকাশ:</label><input id="bkash-num"> <label>নগদ:</label><input id="nagad-num"> <button class="btn btn-blue" onclick="saveNumbers()">Save</button>
+                <label>বিকাশ:</label><input id="bkash"> <label>নগদ:</label><input id="nagad"> <button class="btn btn-b" onclick="saveNum()">Save</button>
             </div>
         </div>
     </div>
 
     <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
     <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-database.js"></script>
-
     <script>
         const firebaseConfig = {
           apiKey: "AIzaSyCF9cqEoQwPow2VbB0Koj1yyy4QMDofPQE",
@@ -133,141 +128,147 @@
         firebase.initializeApp(firebaseConfig);
         const db = firebase.database();
 
-        db.ref(".info/connected").on("value", s => {
-            document.getElementById('firebase-status').innerText = s.val() ? "অনলাইন ✅" : "অফলাইন ❌";
-            document.getElementById('firebase-status').style.color = s.val() ? "green" : "red";
-        });
-
-        function showSection(id) {
-            document.querySelectorAll('.page-section').forEach(d => d.classList.remove('active'));
-            document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
-            document.getElementById(id).classList.add('active');
-            if(id === 'users') loadAllUserStats();
-            if(id === 'history') loadAllHistory();
+        function show(id) {
+            document.querySelectorAll('.page-section').forEach(p=>p.style.display='none');
+            document.getElementById(id).style.display='block';
+            if(id==='users') loadUsers();
+            if(id==='pack') loadPacks();
+            if(id==='chat') loadChatUsers();
         }
+        show('dash');
 
-        // ==== ট্র্যাকিং সহ ইউজার লোড ====
-        async function loadAllUserStats() {
-            const tbody = document.getElementById('user-table-body');
-            tbody.innerHTML = '<tr><td colspan="5">লোড হচ্ছে...</td></tr>';
-            
-            try {
-                const [users, deps, wids] = await Promise.all([db.ref('users').get(), db.ref('deposits').get(), db.ref('withdrawals').get()]);
-                if(!users.exists()) { tbody.innerHTML = '<tr><td colspan="5">ইউজার নেই</td></tr>'; return; }
+        // ১. ইউজার ম্যানেজ ও ব্যান
+        async function loadUsers() {
+            const l = document.getElementById('user-list'); l.innerHTML='loading...';
+            const s = await db.ref('users').get();
+            l.innerHTML='';
+            let count = 0;
+            const today = new Date().toISOString().split('T')[0];
 
-                let data = {};
-                users.forEach(u => {
-                    data[u.key] = { 
-                        ...u.val(), 
-                        key: u.key, 
-                        tDep: 0, tWid: 0,
-                        ip: u.val().ip || 'N/A', // আইপি
-                        location: u.val().location || 'Unknown Location' // লোকেশন
-                    };
-                });
+            s.forEach(u => {
+                const v = u.val();
+                if(v.last_active && v.last_active.includes(today)) count++; // ডেইলি একটিভ কাউন্ট
 
-                if(deps.exists()) deps.forEach(d => { if(d.val().status==='approved' && data[d.val().userId]) data[d.val().userId].tDep += (d.val().amount+d.val().bonus); });
-                if(wids.exists()) wids.forEach(w => { if(w.val().status==='approved' && data[w.val().userId]) data[w.val().userId].tWid += w.val().amount; });
+                const btnText = v.isBanned ? 'Unban' : 'Ban';
+                const btnColor = v.isBanned ? 'btn-g' : 'btn-r';
 
-                tbody.innerHTML = '';
-                Object.values(data).reverse().forEach(u => {
-                    tbody.innerHTML += `<tr>
-                        <td><b>${u.name}</b><br><small>${u.key}</small></td>
-                        <td>
-                            <span class="loc-badge">📍 ${u.location}</span>
-                            <span class="ip-badge">VIP IP: ${u.ip}</span>
-                        </td>
-                        <td style="color:blue; font-weight:bold">৳${u.balance}</td>
-                        <td><span style="color:green">In: ${u.tDep}</span> | <span style="color:red">Out: ${u.tWid}</span></td>
-                        <td>
-                            <div class="edit-box">
-                                <input type="number" id="b-${u.key}" placeholder="New">
-                                <button class="btn btn-blue" onclick="setBal('${u.key}')">Set</button>
-                            </div>
-                        </td>
-                    </tr>`;
-                });
-            } catch(e) { console.error(e); }
+                l.innerHTML += `<tr>
+                    <td>${v.name}<br><small>${u.key}</small></td>
+                    <td>${v.location||'N/A'}<br><small>${v.ip||'N/A'}</small></td>
+                    <td>${v.balance} <button onclick="editBal('${u.key}')">✏</button></td>
+                    <td>Dep: 0 | Wid: 0</td> 
+                    <td><button class="btn ${btnColor}" onclick="toggleBan('${u.key}', ${v.isBanned})">${btnText}</button></td>
+                </tr>`;
+            });
+            document.getElementById('daily-active').innerText = count;
         }
-
-        function setBal(uid) {
-            const val = parseFloat(document.getElementById('b-'+uid).value);
-            if(!isNaN(val) && confirm('ব্যালেন্স আপডেট করবেন?')) {
-                db.ref('users/'+uid).update({balance: val}).then(() => {
-                    alert('ব্যালেন্স আপডেট হয়েছে!');
-                    loadAllUserStats();
-                });
+        function toggleBan(uid, status) {
+            if(confirm(status ? "Unban User?" : "Ban User?")) {
+                db.ref('users/'+uid).update({isBanned: !status}).then(()=>loadUsers());
             }
         }
-
-        function filterUsers() {
-            const filter = document.getElementById('search-box').value.toUpperCase();
-            const tr = document.getElementById('user-table-body').getElementsByTagName('tr');
-            for(let i=0; i<tr.length; i++) {
-                const td = tr[i].getElementsByTagName('td')[0];
-                if(td) tr[i].style.display = td.textContent.toUpperCase().indexOf(filter) > -1 ? "" : "none";
-            }
+        function editBal(uid){
+            let n = prompt("New Balance:");
+            if(n) db.ref('users/'+uid).update({balance: parseFloat(n)}).then(()=>loadUsers());
         }
 
-        // ==== রিকোয়েস্ট হ্যান্ডলিং ====
+        // ২. প্যাকেজ ম্যানেজ
+        function loadPacks() {
+            db.ref('packages').on('value', s => {
+                const l = document.getElementById('pack-list'); l.innerHTML='';
+                s.forEach(p => {
+                    l.innerHTML += `<tr><td>${p.val().name}</td><td>${p.val().price}</td><td>${p.val().bonus}</td>
+                    <td><button class="btn btn-r" onclick="delPack('${p.key}')">Del</button></td></tr>`;
+                });
+            });
+        }
+        function addPack() {
+            const name = document.getElementById('p-name').value;
+            const price = document.getElementById('p-price').value;
+            const bonus = document.getElementById('p-bonus').value;
+            if(name && price) {
+                db.ref('packages').push({name, price:parseFloat(price), bonus:parseFloat(bonus)});
+                alert('Added');
+            }
+        }
+        function delPack(k) { if(confirm('Delete?')) db.ref('packages/'+k).remove(); }
+
+        // ৩. রিকোয়েস্ট (লোকেশন সহ)
         db.ref('deposits').orderByChild('status').equalTo('pending').on('value', s => {
-            const l = document.getElementById('deposit-list'); l.innerHTML = '';
-            if(!s.exists()) l.innerHTML = '<tr><td colspan="4">নেই</td></tr>';
+            const l = document.getElementById('dep-list'); l.innerHTML='';
             s.forEach(d => {
-                l.innerHTML += `<tr><td>${d.val().userName}</td><td>${d.val().amount}</td><td>${d.val().method}<br><small>${d.val().trxId}</small></td>
-                <td><button class="btn btn-approve" onclick="doDep('${d.key}',true,${d.val().amount+d.val().bonus},'${d.val().userId}')">✔</button>
-                <button class="btn btn-reject" onclick="doDep('${d.key}',false)">✖</button></td></tr>`;
+                l.innerHTML += `<tr><td>${d.val().userName}<br>Loc: ${d.val().location||'N/A'}</td>
+                <td>Method: ${d.val().method}<br>Trx: ${d.val().trxId}</td>
+                <td>৳${d.val().amount}</td>
+                <td><button class="btn btn-g" onclick="proc('${d.key}','deposits',true,${d.val().amount+d.val().bonus},'${d.val().userId}')">✔</button>
+                <button class="btn btn-r" onclick="proc('${d.key}','deposits',false)">✖</button></td></tr>`;
             });
         });
         db.ref('withdrawals').orderByChild('status').equalTo('pending').on('value', s => {
-            const l = document.getElementById('withdraw-list'); l.innerHTML = '';
-            if(!s.exists()) l.innerHTML = '<tr><td colspan="4">নেই</td></tr>';
+            const l = document.getElementById('wid-list'); l.innerHTML='';
             s.forEach(d => {
-                l.innerHTML += `<tr><td>${d.val().userName}</td><td>${d.val().amount}</td><td>${d.val().number}</td>
-                <td><button class="btn btn-approve" onclick="doWid('${d.key}',true)">✔</button>
-                <button class="btn btn-reject" onclick="doWid('${d.key}',false,${d.val().amount},'${d.val().userId}')">✖</button></td></tr>`;
+                l.innerHTML += `<tr><td>${d.val().userName}<br>Loc: ${d.val().location||'N/A'}</td>
+                <td>To: ${d.val().number}<br>${d.val().method}</td>
+                <td>৳${d.val().amount}</td>
+                <td><button class="btn btn-g" onclick="proc('${d.key}','withdrawals',true,0)">✔</button>
+                <button class="btn btn-r" onclick="proc('${d.key}','withdrawals',false,${d.val().amount},'${d.val().userId}')">✖</button></td></tr>`;
             });
         });
 
-        function doDep(k, app, amt, uid) {
-            if(!confirm('Confirm action?')) return;
-            if(app) db.ref('users/'+uid+'/balance').transaction(c=>(c||0)+amt).then(()=>db.ref('deposits/'+k).update({status:'approved'}));
-            else db.ref('deposits/'+k).update({status:'rejected'});
-        }
-        function doWid(k, app, amt, uid) {
-            if(!confirm('Confirm action?')) return;
-            if(!app) db.ref('users/'+uid+'/balance').transaction(c=>(c||0)+amt).then(()=>db.ref('withdrawals/'+k).update({status:'rejected'}));
-            else db.ref('withdrawals/'+k).update({status:'approved'});
+        function proc(k, type, ok, amt, uid) {
+            if(!confirm('Confirm?')) return;
+            if(ok) {
+                // এপ্রুভ হলে ব্যালেন্স যোগ হবে (ডিপোজিট হলে)
+                if(type==='deposits') db.ref('users/'+uid+'/balance').transaction(c=>(c||0)+amt);
+                db.ref(type+'/'+k).update({status:'approved'});
+            } else {
+                // রিজেক্ট হলে ব্যালেন্স ফেরত (উইথড্র হলে)
+                if(type==='withdrawals') db.ref('users/'+uid+'/balance').transaction(c=>(c||0)+amt);
+                db.ref(type+'/'+k).update({status:'rejected'});
+            }
         }
 
-        async function loadAllHistory() {
-            const l = document.getElementById('history-list'); l.innerHTML = '<tr><td colspan="4">লোড হচ্ছে...</td></tr>';
-            const [d, w] = await Promise.all([db.ref('deposits').get(), db.ref('withdrawals').get()]);
-            let all = [];
-            if(d.exists()) d.forEach(x => { if(x.val().status==='approved') all.push({...x.val(), t:'Deposit'}); });
-            if(w.exists()) w.forEach(x => { if(x.val().status==='approved') all.push({...x.val(), t:'Withdraw'}); });
-            
-            l.innerHTML = '';
-            all.reverse().forEach(x => {
-                l.innerHTML += `<tr><td>${x.userName}</td><td>${x.t}</td><td>${x.amount}</td><td style="color:green">Approved</td></tr>`;
+        // ৪. চ্যাট সিস্টেম
+        let currentChatUser = null;
+        function loadChatUsers() {
+            db.ref('chats').on('value', s => {
+                const l = document.getElementById('chat-users'); l.innerHTML='';
+                s.forEach(u => {
+                    l.innerHTML += `<div style="padding:10px; border-bottom:1px solid #eee; cursor:pointer;" onclick="openChat('${u.key}')">${u.key}</div>`;
+                });
             });
+        }
+        function openChat(uid) {
+            currentChatUser = uid;
+            document.getElementById('chat-with').innerText = 'Chat with: ' + uid;
+            db.ref('chats/'+uid).limitToLast(20).on('value', s => {
+                const d = document.getElementById('chat-display'); d.innerHTML='';
+                s.forEach(m => {
+                    const c = m.val().sender==='admin'?'msg-a':'msg-u';
+                    d.innerHTML += `<div class="msg ${c}">${m.val().text}</div>`;
+                });
+                d.scrollTop = d.scrollHeight;
+            });
+        }
+        function sendChat() {
+            const txt = document.getElementById('chat-msg').value;
+            if(currentChatUser && txt) {
+                db.ref('chats/'+currentChatUser).push({sender:'admin', text:txt, timestamp:new Date().toISOString()});
+                document.getElementById('chat-msg').value='';
+            }
         }
 
         // সেটিংস
-        function saveNotice(){ db.ref('settings/notice').set({text:document.getElementById('notice-input').value}).then(()=>alert('Saved')); }
-        function saveRules(){ db.ref('settings/rules').set({text:document.getElementById('rules-input').value}).then(()=>alert('Saved')); }
-        function saveNumbers(){ db.ref('settings/paymentNumbers').set({bkash:document.getElementById('bkash-num').value, nagad:document.getElementById('nagad-num').value}).then(()=>alert('Saved')); }
-        
-        db.ref('settings').once('value',s=>{
-            if(s.exists()){
-                if(s.val().notice) document.getElementById('notice-input').value = s.val().notice.text;
-                if(s.val().rules) document.getElementById('rules-input').value = s.val().rules.text;
-                if(s.val().paymentNumbers) {
-                     document.getElementById('bkash-num').value = s.val().paymentNumbers.bkash;
-                     document.getElementById('nagad-num').value = s.val().paymentNumbers.nagad;
-                }
-            }
-        });
+        function saveSet(t) { 
+            const val = document.getElementById(t==='notice'?'notice':'rules').value;
+            db.ref('settings/'+t).set({text: val}).then(()=>alert('Saved'));
+        }
+        function saveNum() {
+            db.ref('settings/paymentNumbers').set({
+                bkash: document.getElementById('bkash').value,
+                nagad: document.getElementById('nagad').value
+            }).then(()=>alert('Saved'));
+        }
     </script>
 </body>
 </html>
