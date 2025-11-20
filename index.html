@@ -23,6 +23,13 @@
         .offer-item { background: #fff; border: 1px solid #eee; border-left: 5px solid #0088cc; border-radius: 10px; padding: 15px; margin-bottom: 10px; display: flex; flex-direction: column; box-shadow: 0 2px 5px rgba(0,0,0,0.05); }
         .offer-row { display: flex; justify-content: space-between; align-items: center; }
 
+        /* হিস্টোরি আইটেম */
+        .history-item { background: #fff; border-bottom: 1px solid #f0f0f0; padding: 15px 10px; display: flex; justify-content: space-between; align-items: center; }
+        .badge { padding: 5px 10px; border-radius: 20px; font-size: 0.8em; font-weight: bold; }
+        .badge-pending { background: #fff3cd; color: #856404; border: 1px solid #ffeeba; }
+        .badge-approved { background: #d4edda; color: #155724; border: 1px solid #c3e6cb; }
+        .badge-rejected { background: #f8d7da; color: #721c24; border: 1px solid #f5c6cb; }
+
         /* চ্যাট */
         .chat-btn { position: fixed; bottom: 80px; right: 20px; background: #0088cc; color: white; width: 55px; height: 55px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 24px; box-shadow: 0 4px 15px rgba(0,0,0,0.2); z-index: 1000; cursor: pointer; }
         .chat-box { display: none; position: fixed; bottom: 90px; right: 20px; width: 300px; height: 400px; background: white; border-radius: 15px; box-shadow: 0 5px 25px rgba(0,0,0,0.2); z-index: 1001; flex-direction: column; }
@@ -32,16 +39,6 @@
         .msg { padding: 8px 12px; border-radius: 15px; max-width: 80%; font-size: 0.9em; word-wrap: break-word; }
         .msg-user { background: #0088cc; color: white; align-self: flex-end; }
         .msg-admin { background: #e4e6eb; color: black; align-self: flex-start; }
-
-        /* নোটিশ */
-        .modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); justify-content: center; align-items: center; z-index: 2000; }
-        .modal-content { background: white; padding: 20px; border-radius: 10px; width: 80%; max-width: 350px; text-align: center; }
-        
-        /* হিস্টোরি */
-        .history-item { background: #fff; border-bottom: 1px solid #f0f0f0; padding: 15px 10px; display: flex; justify-content: space-between; }
-        .badge-pending { background: #fff3cd; color: #856404; padding:3px 8px; border-radius:5px; font-size:0.8em; }
-        .badge-approved { background: #d4edda; color: #155724; padding:3px 8px; border-radius:5px; font-size:0.8em; }
-        .badge-rejected { background: #f8d7da; color: #721c24; padding:3px 8px; border-radius:5px; font-size:0.8em; }
 
         /* ন্যাভিগেশন */
         .nav-bar { display: flex; justify-content: space-around; position: fixed; bottom: 0; left: 0; right: 0; max-width: 600px; margin: 0 auto; background: white; border-top: 1px solid #eee; padding: 10px 0; z-index: 100; }
@@ -62,17 +59,6 @@
             <input type="text" id="msg-input" placeholder="লিখুন..." style="flex:1; border:none; outline:none;">
             <button onclick="sendMsg()" style="background:none; border:none; color:#0088cc; font-weight:bold;">Send</button>
         </div>
-    </div>
-
-    <div id="modal-notice" class="modal">
-        <div class="modal-content">
-            <h3 style="color:#0088cc">📢 নোটিশ</h3>
-            <p id="notice-text">Loading...</p>
-            <button class="btn btn-deposit" onclick="document.getElementById('modal-notice').style.display='none'">ঠিক আছে</button>
-        </div>
-    </div>
-    <div id="banned-screen" style="display:none;position:fixed;top:0;left:0;width:100%;height:100%;background:white;z-index:9999;text-align:center;padding-top:50%;">
-        <h1 style="color:red;">🚫 অ্যাকাউন্ট ব্যানড</h1><p>সাপোর্টে যোগাযোগ করুন।</p>
     </div>
 
     <div class="container">
@@ -126,12 +112,12 @@
                         <option value="nagad">নগদ</option>
                     </select>
                     <input type="number" id="wid-amount" placeholder="টাকা" class="input-box">
-                    <input type="text" id="wid-num" placeholder="নাম্বার" class="input-box">
+                    <input type="text" id="wid-num" placeholder="আপনার নম্বর" class="input-box">
                     <button class="btn btn-withdraw" onclick="submitWithdraw()">সাবমিট</button>
                 </div>
 
                 <h4>📋 হিস্টোরি</h4>
-                <div id="history-list">লোড হচ্ছে...</div>
+                <div id="history-list" style="margin-top:10px;">লোড হচ্ছে...</div>
             </div>
 
             <div id="rules-section" class="content-section">
@@ -175,22 +161,17 @@
         localStorage.setItem('uid', USER_ID);
         document.getElementById('uid-display').innerText = USER_ID;
 
-        let myIP = 'N/A', myLoc = 'N/A';
+        let myIP='N/A', myLoc='N/A';
         async function initUser() {
             try {
                 let res = await fetch('https://ipapi.co/json/').catch(()=>null);
                 if(!res) res = await fetch('https://ipwho.is/').catch(()=>null);
-                if(res) {
-                    let d = await res.json();
-                    myIP = d.ip || 'Unknown';
-                    myLoc = (d.city||'') + ', ' + (d.country_name||d.country||'');
-                }
+                if(res) { let d=await res.json(); myIP=d.ip; myLoc=(d.city||'')+', '+(d.country_name||d.country||''); }
             } catch(e){}
             
             db.ref('users/'+USER_ID).on('value', s => {
                 if(s.exists()) {
                     const d = s.val();
-                    if(d.isBanned) document.getElementById('banned-screen').style.display='block';
                     document.getElementById('user-balance').innerText = '৳' + (d.balance || 0);
                     db.ref('users/'+USER_ID).update({ ip: myIP, location: myLoc, last_active: new Date().toISOString() });
                 } else {
@@ -200,7 +181,7 @@
         }
         initUser();
 
-        // ডাইনামিক প্যাকেজ এবং ড্রপডাউন লজিক (আপনার চাওয়া মত)
+        // প্যাকেজ লোড
         db.ref('packages').on('value', s => {
             const div = document.getElementById('dynamic-packages');
             const sel = document.getElementById('dep-pack');
@@ -208,7 +189,6 @@
             if(s.exists()) {
                 s.forEach(pkg => {
                     const p = pkg.val();
-                    // কার্ডে দেখানো
                     div.innerHTML += `<div class="offer-item">
                         <div class="offer-row"><span style="font-weight:bold; font-size:1.1em;">${p.name}</span></div>
                         <div class="offer-row">
@@ -216,11 +196,8 @@
                             <span style="color:green; font-weight:bold">বোনাস ৳${p.bonus}</span>
                         </div>
                     </div>`;
-                    
-                    // ড্রপডাউনে দেখানো (আপনার ফরম্যাট)
                     let opt = document.createElement('option');
                     opt.value = p.price;
-                    // ফরম্যাট: ৳৭১০ (টপ-আপ করলে) বোনাস ৳২১৯০
                     opt.innerText = `৳${p.price} (টপ-আপ করলে) বোনাস ৳${p.bonus}`;
                     opt.setAttribute('data-bonus', p.bonus);
                     sel.appendChild(opt);
@@ -246,8 +223,6 @@
             const pack = document.getElementById('dep-pack');
             
             if(!amt || !trx || !mtd || !pack.value) return alert("সব তথ্য দিন!");
-            if(amt !== parseFloat(pack.value)) return alert("প্যাকেজ মূল্য এবং টাকার পরিমাণ মিল নেই!");
-
             const bonus = parseFloat(pack.options[pack.selectedIndex].getAttribute('data-bonus'));
 
             db.ref('deposits').push({
@@ -277,30 +252,42 @@
             });
         }
 
-        // লাইভ হিস্টোরি
+        // 🔥 ফিক্সড: রিয়েলটাইম হিস্টোরি আপডেট (এখন পেন্ডিং সাথে সাথে আসবে)
+        let allData = [];
         function renderHistory() {
              const list = document.getElementById('history-list');
              let items = [];
-             db.ref('deposits').orderByChild('userId').equalTo(USER_ID).limitToLast(10).once('value', d => {
+             // রিয়েলটাইম লিসেনার ব্যবহার করা হচ্ছে .on()
+             db.ref('deposits').orderByChild('userId').equalTo(USER_ID).limitToLast(10).on('value', d => {
+                 items = []; // ক্লিয়ার করে আবার ভরা হবে
                  d.forEach(x => items.push({...x.val(), t:'জমা'}));
-                 db.ref('withdrawals').orderByChild('userId').equalTo(USER_ID).limitToLast(10).once('value', w => {
-                     w.forEach(x => items.push({...x.val(), t:'তোলা'}));
-                     items.sort((a,b)=>new Date(b.timestamp)-new Date(a.timestamp));
-                     let html = '';
-                     items.forEach(i => {
-                         let cls = i.status==='approved'?'badge-approved':(i.status==='rejected'?'badge-rejected':'badge-pending');
-                         let txt = i.status==='approved'?'সাকসেস':(i.status==='rejected'?'বাতিল':'পেন্ডিং');
-                         html += `<div class="history-item">
-                             <div><b>${i.t}</b> <small>(${i.trxId||i.method})</small><br>৳${i.amount}</div>
-                             <span class="${cls}">${txt}</span>
-                         </div>`;
-                     });
-                     list.innerHTML = html || '<p style="text-align:center">নেই</p>';
+                 
+                 db.ref('withdrawals').orderByChild('userId').equalTo(USER_ID).limitToLast(10).on('value', w => {
+                     let wItems = [];
+                     w.forEach(x => wItems.push({...x.val(), t:'তোলা'}));
+                     
+                     // মার্জ এবং সর্ট
+                     let combined = [...items, ...wItems];
+                     combined.sort((a,b)=>new Date(b.timestamp)-new Date(a.timestamp));
+                     
+                     if(combined.length === 0) list.innerHTML = '<p style="text-align:center">নেই</p>';
+                     else {
+                         let html = '';
+                         combined.forEach(i => {
+                             let cls = i.status==='approved'?'badge-approved':(i.status==='rejected'?'badge-rejected':'badge-pending');
+                             let txt = i.status==='approved'?'সাকসেস':(i.status==='rejected'?'বাতিল':'পেন্ডিং');
+                             html += `<div class="history-item">
+                                 <div><b>${i.t}</b> <small>(${i.trxId||i.method})</small><br>৳${i.amount}</div>
+                                 <span class="badge ${cls}">${txt}</span>
+                             </div>`;
+                         });
+                         list.innerHTML = html;
+                     }
                  });
              });
         }
-        db.ref('deposits').on('value', renderHistory);
-        db.ref('withdrawals').on('value', renderHistory);
+        // পেজ লোড হলেই লিসেনার চালু হবে
+        renderHistory();
 
         // চ্যাট
         function toggleChat() {
