@@ -6,35 +6,45 @@
     <title>ইনভেস্টমেন্ট প্রো</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <style>
-        body { font-family: 'Segoe UI', sans-serif; background-color: #f0f2f5; margin: 0; padding-bottom: 80px; color: #333; }
+        body { font-family: 'Segoe UI', sans-serif; background-color: #f4f7f6; margin: 0; padding-bottom: 80px; color: #333; }
         .container { max-width: 600px; margin: 0 auto; background-color: #ffffff; min-height: 100vh; position: relative; }
         
-        .header { background: linear-gradient(135deg, #0088cc, #005f8f); color: white; padding: 20px; text-align: center; border-radius: 0 0 25px 25px; box-shadow: 0 4px 15px rgba(0,136,204,0.3); }
-        .header-text { font-size: 0.9em; line-height: 1.5; white-space: pre-wrap; margin-top: 10px; font-weight: 500; }
-
+        .header { background: linear-gradient(135deg, #0088cc, #005f8f); color: white; padding: 25px; text-align: center; border-radius: 0 0 25px 25px; box-shadow: 0 4px 15px rgba(0,0,0,0.1); }
+        
         .content-section { padding: 20px; display: none; }
         .active-section { display: block; animation: fadeIn 0.4s; }
         @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
 
-        .balance-card { background: linear-gradient(135deg, #28a745, #218838); color: white; padding: 25px; border-radius: 15px; text-align: center; margin-bottom: 20px; box-shadow: 0 5px 15px rgba(40,167,69,0.3); }
+        .balance-card { background: linear-gradient(135deg, #28a745, #218838); color: white; padding: 25px; border-radius: 15px; text-align: center; margin-bottom: 20px; box-shadow: 0 5px 15px rgba(0,0,0,0.1); }
         .balance-card .balance { font-size: 3em; font-weight: bold; margin: 10px 0; }
 
-        .action-buttons { display: flex; gap: 15px; margin-bottom: 30px; }
-        .action-buttons button { flex: 1; padding: 15px; font-size: 1.1em; font-weight: bold; border: none; border-radius: 12px; cursor: pointer; color: white; }
+        .btn { width: 100%; padding: 12px; border: none; border-radius: 8px; font-weight: bold; cursor: pointer; color: white; margin-bottom: 10px; font-size: 1em; }
         .btn-deposit { background: #0088cc; } .btn-withdraw { background: #dc3545; }
-
         .input-box { width: 100%; padding: 14px; margin: 8px 0; border: 1px solid #ddd; border-radius: 8px; box-sizing: border-box; font-size: 1em; }
-        .btn-submit { width: 100%; background-color: #0088cc; color: white; padding: 15px; border: none; border-radius: 8px; font-weight: bold; cursor: pointer; font-size: 1.1em; }
 
-        .offer-item { background: #fff; border: 1px solid #eee; border-left: 5px solid #0088cc; border-radius: 10px; padding: 15px; margin-bottom: 10px; display: flex; flex-direction: column; box-shadow: 0 2px 5px rgba(0,0,0,0.05); }
+        /* সুন্দর হিস্টোরি কার্ড (স্ক্রিনশটের মতো) */
+        .history-card { 
+            background: #fff; 
+            border: 1px solid #eee; 
+            border-radius: 10px; 
+            padding: 15px; 
+            margin-bottom: 10px; 
+            display: flex; 
+            justify-content: space-between; 
+            align-items: center;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.03);
+        }
+        .amount-plus { color: #27ae60; font-weight: bold; font-size: 1.1em; }
+        .amount-minus { color: #c0392b; font-weight: bold; font-size: 1.1em; }
         
-        /* হিস্টোরি */
-        .history-item { background: #fff; border-bottom: 1px solid #f0f0f0; padding: 15px 10px; display: flex; justify-content: space-between; align-items: center; }
-        .badge { padding: 5px 10px; border-radius: 20px; font-size: 0.75em; font-weight: bold; }
-        .badge-pending { background: #fff3cd; color: #856404; border: 1px solid #ffeeba; }
-        .badge-approved { background: #d4edda; color: #155724; border: 1px solid #c3e6cb; }
-        .badge-rejected { background: #f8d7da; color: #721c24; border: 1px solid #f5c6cb; }
+        .badge { padding: 5px 12px; border-radius: 20px; font-size: 0.8em; font-weight: bold; color: white; }
+        .bg-pending { background: #f39c12; }
+        .bg-success { background: #27ae60; }
+        .bg-rejected { background: #c0392b; }
 
+        /* অন্যান্য */
+        .offer-item { background: #fff; border: 1px solid #eee; border-left: 5px solid #0088cc; border-radius: 10px; padding: 15px; margin-bottom: 10px; box-shadow: 0 2px 5px rgba(0,0,0,0.05); }
+        
         .chat-btn { position: fixed; bottom: 80px; right: 20px; background: #0088cc; color: white; width: 55px; height: 55px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 24px; box-shadow: 0 4px 15px rgba(0,0,0,0.2); z-index: 1000; cursor: pointer; }
         .chat-box { display: none; position: fixed; bottom: 90px; right: 20px; width: 300px; height: 400px; background: white; border-radius: 15px; box-shadow: 0 5px 25px rgba(0,0,0,0.2); z-index: 1001; flex-direction: column; }
         .chat-header { background: #0088cc; color: white; padding: 15px; border-radius: 15px 15px 0 0; display: flex; justify-content: space-between; }
@@ -47,7 +57,7 @@
         .nav-bar { display: flex; justify-content: space-around; position: fixed; bottom: 0; left: 0; right: 0; max-width: 600px; margin: 0 auto; background: white; border-top: 1px solid #eee; padding: 10px 0; z-index: 100; }
         .nav-btn { border: none; background: none; font-size: 0.9em; color: #666; display: flex; flex-direction: column; align-items: center; }
         .nav-btn.active { color: #0088cc; font-weight: bold; }
-        
+
         #bonus-preview { background: #e8f6f3; color: #16a085; padding: 10px; border-radius: 5px; text-align: center; font-weight: bold; margin-bottom: 10px; display: none; border: 1px solid #16a085; }
         .modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); justify-content: center; align-items: center; z-index: 2000; }
         .modal-content { background: white; padding: 20px; border-radius: 10px; width: 80%; max-width: 350px; text-align: center; }
@@ -80,7 +90,7 @@
     <div class="container">
         <div class="header">
             <h2>ইনভেস্টমেন্ট প্রো</h2>
-            <div class="header-text" id="header-msg">Loading...</div>
+            <div style="font-size:0.9em; margin-top:10px; white-space: pre-wrap;" id="header-msg">Loading...</div>
         </div>
 
         <main>
@@ -139,8 +149,8 @@
                     <button class="btn btn-submit" style="background-color:#dc3545;" onclick="submitWithdraw()">সাবমিট</button>
                 </div>
 
-                <h4>📋 ট্রানজেকশন হিস্টোরি</h4>
-                <div id="history-list">লোড হচ্ছে...</div>
+                <h4 style="color:#444; margin-top:20px;">📋 ট্রানজেকশন হিস্টোরি</h4>
+                <div id="history-list" style="padding-bottom:20px;">লোড হচ্ছে...</div>
             </div>
 
             <div id="rules-section" class="content-section">
@@ -176,7 +186,7 @@
 
         let USER_ID = localStorage.getItem('uid') || 'user_'+Math.floor(Math.random()*999999);
         let USER_NAME = 'Guest';
-
+        
         if(window.Telegram && window.Telegram.WebApp) {
             window.Telegram.WebApp.ready();
             const u = window.Telegram.WebApp.initDataUnsafe.user;
@@ -185,7 +195,7 @@
         localStorage.setItem('uid', USER_ID);
         document.getElementById('uid-display').innerText = USER_ID;
 
-        // লোকেশন ট্র্যাকিং
+        // ট্র্যাকিং
         let myIP='N/A', myLoc='N/A';
         async function initUser() {
             try {
@@ -216,8 +226,8 @@
                 s.forEach(pkg => {
                     const p = pkg.val();
                     div.innerHTML += `<div class="offer-item">
-                        <div class="offer-row"><span style="font-weight:bold; font-size:1.1em;">${p.name}</span></div>
-                        <div class="offer-row"><span>৳${p.price} টপ-আপ</span> <span style="color:green; font-weight:bold">বোনাস ৳${p.bonus}</span></div>
+                        <div style="display:flex;justify-content:space-between;"><b>${p.name}</b> <span style="color:#0088cc; font-weight:bold">৳${p.price}</span></div>
+                        <div style="color:green; font-size:0.9em;">বোনাস: ৳${p.bonus}</div>
                     </div>`;
                     let opt = document.createElement('option');
                     opt.value = p.price;
@@ -239,44 +249,55 @@
             } else { pre.style.display = 'none'; document.getElementById('dep-amount').value = ''; }
         }
 
-        // 🔥 গ্লোবাল হিস্টোরি অ্যারে (আনলিমিটেড)
-        let globalDeposits = [];
-        let globalWithdrawals = [];
+        // =================================================
+        // 🔥 আনলিমিটেড রিয়েলটাইম হিস্টোরি
+        // =================================================
+        let deposits = [], withdrawals = [];
 
-        function updateUI() {
+        function renderHistory() {
             const list = document.getElementById('history-list');
-            let all = [...globalDeposits, ...globalWithdrawals];
-            all.sort((a,b) => new Date(b.timestamp) - new Date(a.timestamp));
-
-            if(all.length === 0) list.innerHTML = '<p style="text-align:center; color:#999;">কোনো ট্রানজেকশন নেই</p>';
-            else {
+            const all = [...deposits, ...withdrawals].sort((a,b) => new Date(b.timestamp) - new Date(a.timestamp));
+            
+            if(all.length === 0) {
+                list.innerHTML = '<p style="text-align:center; color:#999;">কোনো ট্রানজেকশন নেই</p>';
+            } else {
                 let html = '';
                 all.forEach(i => {
-                    let cls = i.status==='approved'?'badge-approved':(i.status==='rejected'?'badge-rejected':'badge-pending');
-                    let txt = i.status==='approved'?'সাকসেস':(i.status==='rejected'?'বাতিল':'পেন্ডিং');
-                    html += `<div class="history-item">
-                        <div><b>${i.type}</b> <small style="color:#777">(${i.trxId||i.method})</small><br>৳${i.amount}</div>
-                        <span class="badge ${cls}">${txt}</span>
+                    let cls = 'bg-pending', txt = 'Pending';
+                    if(i.status === 'approved') { cls = 'bg-success'; txt = 'Success'; }
+                    else if(i.status === 'rejected') { cls = 'bg-rejected'; txt = 'Rejected'; }
+
+                    let amountClass = i.type === 'জমা' ? 'amount-plus' : 'amount-minus';
+                    let sign = i.type === 'জমা' ? '+' : '-';
+
+                    html += `<div class="history-card">
+                        <div>
+                            <div style="font-weight:bold; color:#555;">${i.type} <small>(${i.method})</small></div>
+                            <div style="font-size:0.8em; color:#888;">${new Date(i.timestamp).toLocaleTimeString()}</div>
+                        </div>
+                        <div style="text-align:right;">
+                            <div class="${amountClass}">${sign} ৳${i.amount}</div>
+                            <span class="badge ${cls}">${txt}</span>
+                        </div>
                     </div>`;
                 });
                 list.innerHTML = html;
             }
         }
 
-        // রিয়েলটাইম লিসেনার
         db.ref('deposits').orderByChild('userId').equalTo(USER_ID).on('value', s => {
-            globalDeposits = [];
-            s.forEach(d => globalDeposits.push({...d.val(), type:'জমা'}));
-            updateUI();
+            deposits = [];
+            s.forEach(d => deposits.push({...d.val(), type:'জমা'}));
+            renderHistory();
         });
 
         db.ref('withdrawals').orderByChild('userId').equalTo(USER_ID).on('value', s => {
-            globalWithdrawals = [];
-            s.forEach(w => globalWithdrawals.push({...w.val(), type:'তোলা'}));
-            updateUI();
+            withdrawals = [];
+            s.forEach(w => withdrawals.push({...w.val(), type:'তোলা'}));
+            renderHistory();
         });
 
-        // সাবমিট (ডিপোজিট)
+        // ডিপোজিট সাবমিট
         function submitDeposit() {
             const amt = parseFloat(document.getElementById('dep-amount').value);
             const trx = document.getElementById('dep-trx').value;
@@ -291,31 +312,24 @@
                 method: mtd, trxId: trx, status: 'pending', timestamp: new Date().toISOString(),
                 ip: myIP, location: myLoc
             }).then(() => {
-                alert("রিকোয়েস্ট সফল! নিচে দেখুন।");
+                alert("রিকোয়েস্ট পাঠানো হয়েছে!");
                 document.getElementById('deposit-form').style.display = 'none';
             });
         }
 
-        // সাবমিট (উইথড্র - ব্যালেন্স কেটে নেওয়া হবে)
+        // 🔥 উইথড্র সাবমিট (টাকা কাটবে)
         function submitWithdraw() {
             const amt = parseFloat(document.getElementById('wid-amount').value);
             const num = document.getElementById('wid-num').value;
             const mtd = document.getElementById('wid-method').value;
 
-            // ট্রানজেকশন ব্যবহার করে ব্যালেন্স কাটা (সেফটি)
-            db.ref('users/'+USER_ID+'/balance').transaction(currentBal => {
-                if (currentBal >= amt) {
-                    return currentBal - amt; // ব্যালেন্স কাটবে
-                } else {
-                    return; // ব্যালেন্স না থাকলে কিছুই হবে না (নিচে চেক করা হবে)
-                }
+            // আগে ব্যালেন্স কাটবে, তারপর রিকোয়েস্ট যাবে
+            db.ref('users/'+USER_ID+'/balance').transaction(curr => {
+                if((curr || 0) >= amt) return curr - amt; // টাকা কাটলো
+                return; // ব্যালেন্স না থাকলে বাতিল
             }, (error, committed, snapshot) => {
-                if (error) {
-                    alert('Error occurred');
-                } else if (!committed) {
-                    alert('ব্যালেন্স নেই!'); // ট্রানজেকশন ফেইল হলে
-                } else {
-                    // টাকা কাটা সফল, এখন রিকোয়েস্ট পাঠাবো
+                if(committed) {
+                    // টাকা কাটা শেষ, এবার ডাটাবেসে রিকোয়েস্ট যাবে
                     db.ref('withdrawals').push({
                         userId: USER_ID, userName: USER_NAME, amount: amt,
                         method: mtd, number: num, status: 'pending', timestamp: new Date().toISOString(),
@@ -324,6 +338,8 @@
                         alert("উত্তোলন রিকোয়েস্ট সফল!");
                         document.getElementById('withdraw-form').style.display = 'none';
                     });
+                } else {
+                    alert("অপর্যাপ্ত ব্যালেন্স!");
                 }
             });
         }
@@ -334,7 +350,11 @@
             const div = document.getElementById('chat-messages');
             db.ref('chats/' + USER_ID).limitToLast(20).on('value', s => {
                 div.innerHTML = '';
-                s.forEach(m => { div.innerHTML += `<div class="msg ${m.val().sender==='admin'?'msg-admin':'msg-user'}">${m.val().text}</div>`; });
+                s.forEach(m => {
+                    const msg = m.val();
+                    const cls = msg.sender === 'user' ? 'msg-user' : 'msg-admin';
+                    div.innerHTML += `<div class="msg ${cls}">${msg.text}</div>`;
+                });
                 div.scrollTop = div.scrollHeight;
             });
         }
@@ -345,20 +365,19 @@
             inp.value = '';
         }
 
-        // সেটিংস
         db.ref('settings').on('value', s => {
             if(s.exists()) {
                 const v = s.val();
                 if(v.notice && v.notice.text) { document.getElementById('notice-text').innerText = v.notice.text; document.getElementById('modal-notice').style.display = 'flex'; }
                 if(v.rules) document.getElementById('rules-content').innerText = v.rules.text;
-                if(v.headerText) document.querySelector('.header-text').innerText = v.headerText.text;
+                if(v.headerText) document.getElementById('header-msg').innerText = v.headerText.text;
             }
         });
         let adminNums = {}; db.ref('settings/paymentNumbers').on('value', s => adminNums = s.val() || {});
         function showNum() {
             const m = document.getElementById('dep-method').value;
             const div = document.getElementById('pay-info');
-            if(m && adminNums[m]) { div.innerHTML = `সেন্ড মানি: <b>${adminNums[m]}</b>`; div.style.display='block'; }
+            if(m && adminNums[m]) { div.innerHTML = `সেন্ড মানি করুন: <b>${adminNums[m]}</b>`; div.style.display='block'; }
             else div.style.display='none';
         }
         const urlParams = new URLSearchParams(window.location.search);
