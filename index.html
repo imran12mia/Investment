@@ -9,22 +9,32 @@
         body { font-family: 'Segoe UI', sans-serif; background-color: #f0f2f5; margin: 0; padding-bottom: 80px; color: #333; }
         .container { max-width: 600px; margin: 0 auto; background-color: #ffffff; min-height: 100vh; position: relative; }
         
-        /* হেডার ডিজাইন */
         .header { background: linear-gradient(135deg, #0088cc, #005f8f); color: white; padding: 20px; text-align: center; border-radius: 0 0 25px 25px; box-shadow: 0 4px 15px rgba(0,136,204,0.3); }
-        .header-text { font-size: 0.9em; line-height: 1.5; white-space: pre-wrap; }
+        .header-text { font-size: 0.9em; line-height: 1.5; white-space: pre-wrap; margin-top: 10px; font-weight: 500; }
 
         .content-section { padding: 20px; display: none; }
         .active-section { display: block; animation: fadeIn 0.4s; }
         @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
 
         .balance-card { background: linear-gradient(135deg, #28a745, #218838); color: white; padding: 25px; border-radius: 15px; text-align: center; margin-bottom: 20px; box-shadow: 0 5px 15px rgba(40,167,69,0.3); }
-        .btn { width: 100%; padding: 12px; border: none; border-radius: 8px; font-weight: bold; cursor: pointer; color: white; margin-bottom: 10px; }
+        .balance-card .balance { font-size: 3em; font-weight: bold; margin: 10px 0; }
+
+        .action-buttons { display: flex; gap: 15px; margin-bottom: 30px; }
+        .action-buttons button { flex: 1; padding: 15px; font-size: 1.1em; font-weight: bold; border: none; border-radius: 12px; cursor: pointer; color: white; }
         .btn-deposit { background: #0088cc; } .btn-withdraw { background: #dc3545; }
-        .input-box { width: 100%; padding: 12px; margin: 8px 0; border: 1px solid #ddd; border-radius: 8px; box-sizing: border-box; font-size:1em; }
+
+        .input-box { width: 100%; padding: 14px; margin: 8px 0; border: 1px solid #ddd; border-radius: 8px; box-sizing: border-box; font-size: 1em; }
+        .btn-submit { width: 100%; background-color: #0088cc; color: white; padding: 15px; border: none; border-radius: 8px; font-weight: bold; cursor: pointer; font-size: 1.1em; }
 
         .offer-item { background: #fff; border: 1px solid #eee; border-left: 5px solid #0088cc; border-radius: 10px; padding: 15px; margin-bottom: 10px; display: flex; flex-direction: column; box-shadow: 0 2px 5px rgba(0,0,0,0.05); }
         
-        /* চ্যাট বাটন */
+        /* হিস্টোরি */
+        .history-item { background: #fff; border-bottom: 1px solid #f0f0f0; padding: 15px 10px; display: flex; justify-content: space-between; align-items: center; }
+        .badge { padding: 5px 10px; border-radius: 20px; font-size: 0.75em; font-weight: bold; }
+        .badge-pending { background: #fff3cd; color: #856404; border: 1px solid #ffeeba; }
+        .badge-approved { background: #d4edda; color: #155724; border: 1px solid #c3e6cb; }
+        .badge-rejected { background: #f8d7da; color: #721c24; border: 1px solid #f5c6cb; }
+
         .chat-btn { position: fixed; bottom: 80px; right: 20px; background: #0088cc; color: white; width: 55px; height: 55px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 24px; box-shadow: 0 4px 15px rgba(0,0,0,0.2); z-index: 1000; cursor: pointer; }
         .chat-box { display: none; position: fixed; bottom: 90px; right: 20px; width: 300px; height: 400px; background: white; border-radius: 15px; box-shadow: 0 5px 25px rgba(0,0,0,0.2); z-index: 1001; flex-direction: column; }
         .chat-header { background: #0088cc; color: white; padding: 15px; border-radius: 15px 15px 0 0; display: flex; justify-content: space-between; }
@@ -34,17 +44,13 @@
         .msg-user { background: #0088cc; color: white; align-self: flex-end; }
         .msg-admin { background: #e4e6eb; color: black; align-self: flex-start; }
 
-        /* ন্যাভিগেশন */
         .nav-bar { display: flex; justify-content: space-around; position: fixed; bottom: 0; left: 0; right: 0; max-width: 600px; margin: 0 auto; background: white; border-top: 1px solid #eee; padding: 10px 0; z-index: 100; }
         .nav-btn { border: none; background: none; font-size: 0.9em; color: #666; display: flex; flex-direction: column; align-items: center; }
         .nav-btn.active { color: #0088cc; font-weight: bold; }
         
-        /* হিস্টোরি ব্যাজ */
-        .history-item { background: #fff; border-bottom: 1px solid #f0f0f0; padding: 15px 10px; display: flex; justify-content: space-between; align-items: center; }
-        .badge { padding: 5px 10px; border-radius: 20px; font-size: 0.8em; font-weight: bold; }
-        .badge-pending { background: #fff3cd; color: #856404; } .badge-approved { background: #d4edda; color: #155724; } .badge-rejected { background: #f8d7da; color: #721c24; }
-
         #bonus-preview { background: #e8f6f3; color: #16a085; padding: 10px; border-radius: 5px; text-align: center; font-weight: bold; margin-bottom: 10px; display: none; border: 1px solid #16a085; }
+        .modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); justify-content: center; align-items: center; z-index: 2000; }
+        .modal-content { background: white; padding: 20px; border-radius: 10px; width: 80%; max-width: 350px; text-align: center; }
     </style>
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
 </head>
@@ -52,7 +58,7 @@
 
     <div class="chat-btn" onclick="toggleChat()"><i class="fas fa-headset"></i></div>
     <div class="chat-box" id="chatBox">
-        <div class="chat-header"><span>সাপোর্ট টিম</span><span onclick="toggleChat()" style="cursor:pointer;">✖</span></div>
+        <div class="chat-header"><span>সাপোর্ট</span><span onclick="toggleChat()" style="cursor:pointer;">✖</span></div>
         <div class="chat-body" id="chat-messages"></div>
         <div class="chat-input">
             <input type="text" id="msg-input" placeholder="লিখুন..." style="flex:1; border:none; outline:none;">
@@ -60,23 +66,21 @@
         </div>
     </div>
 
-    <div id="modal-notice" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.5); justify-content:center; align-items:center; z-index:2000;">
-        <div style="background:white; padding:20px; border-radius:10px; width:80%; max-width:350px; text-align:center;">
-            <h3 style="color:#0088cc">📢 জরুরি নোটিশ</h3>
+    <div id="modal-notice" class="modal">
+        <div class="modal-content">
+            <h3 style="color:#0088cc">📢 নোটিশ</h3>
             <p id="notice-text">Loading...</p>
             <button class="btn btn-deposit" onclick="document.getElementById('modal-notice').style.display='none'">ঠিক আছে</button>
         </div>
+    </div>
+    <div id="banned-screen" style="display:none;position:fixed;top:0;left:0;width:100%;height:100%;background:white;z-index:9999;text-align:center;padding-top:50%;">
+        <h1 style="color:red;">🚫 অ্যাকাউন্ট ব্যানড</h1><p>সাপোর্টে যোগাযোগ করুন।</p>
     </div>
 
     <div class="container">
         <div class="header">
             <h2>ইনভেস্টমেন্ট প্রো</h2>
-            <div class="header-text" id="header-msg">
-****__🥰আসসালামু আলাইকুম 🥰 
-
-🟢 স্পিন গ্লোবাল নেটওয়ার্ক এটি পুরো বিশ্বের মানুষ কাজ করেছে। এখানে বিভিন্ন কিপ্টো কারেন্সি মাধ্যমে লেনদেন করা হয়।কিন্তু বাংলাদেশের অনেক মানুষ ক্রিপ্টো কারেন্সি বুঝে না। সেজন্য তাদের  সুবিধার্থে বাংলাদেশী মাধ্যম বিকাশ নগদ এড করা হয়েছে।এখানে প্রতিদিন মার্কেট অনুযায়ী বিভিন্ন অফার দেওয়া হয়।
-স্পিন গ্লোবাল নেটওয়ার্ক বাংলাদেশে একটি শাখা আছে  ✅
-            </div>
+            <div class="header-text" id="header-msg">Loading...</div>
         </div>
 
         <main>
@@ -94,13 +98,19 @@
                     <small>UID: <span id="uid-display">...</span></small>
                 </div>
 
+                <div class="referral-box" style="text-align:center; margin-bottom:20px; background:#eef7fb; padding:15px; border-radius:10px; border:1px dashed #0088cc;">
+                    <b style="color:#005f8f;">👥 ইনভাইট লিংক</b><br>
+                    <input type="text" id="my-ref-link" readonly style="width:60%; padding:5px; border:1px solid #ccc; border-radius:5px; margin-top:5px;">
+                    <button onclick="copyRefLink()" style="padding:5px 10px; background:#0088cc; color:white; border:none; border-radius:5px;">কপি</button>
+                </div>
+
                 <div class="action-buttons">
                     <button class="btn btn-deposit" onclick="showForm('deposit')">ডিপোজিট</button>
                     <button class="btn btn-withdraw" onclick="showForm('withdraw')">উত্তোলন</button>
                 </div>
 
                 <div id="deposit-form" style="display:none; background:#f8f9fa; padding:15px; border-radius:10px; margin-bottom:20px;">
-                    <h4>টাকা জমা দিন</h4>
+                    <h4 style="text-align:center; margin-top:0; color:#0088cc;">টাকা জমা দিন</h4>
                     <select id="dep-method" class="input-box" onchange="showNum()">
                         <option value="">মেথড সিলেক্ট করুন</option>
                         <option value="bkash">বিকাশ</option>
@@ -115,27 +125,28 @@
 
                     <input type="number" id="dep-amount" placeholder="টাকার পরিমাণ" class="input-box">
                     <input type="text" id="dep-trx" placeholder="TrxID" class="input-box">
-                    <button class="btn btn-deposit" onclick="submitDeposit()">রিকোয়েস্ট পাঠান</button>
+                    <button class="btn btn-submit" onclick="submitDeposit()">রিকোয়েস্ট পাঠান</button>
                 </div>
 
                 <div id="withdraw-form" style="display:none; background:#f8f9fa; padding:15px; border-radius:10px; margin-bottom:20px;">
-                    <h4>টাকা উত্তোলন</h4>
+                    <h4 style="text-align:center; margin-top:0; color:#dc3545;">টাকা উত্তোলন</h4>
                     <select id="wid-method" class="input-box">
                         <option value="bkash">বিকাশ</option>
                         <option value="nagad">নগদ</option>
                     </select>
                     <input type="number" id="wid-amount" placeholder="টাকার পরিমাণ" class="input-box">
                     <input type="text" id="wid-num" placeholder="আপনার নম্বর" class="input-box">
-                    <button class="btn btn-withdraw" onclick="submitWithdraw()">সাবমিট</button>
+                    <button class="btn btn-submit" style="background-color:#dc3545;" onclick="submitWithdraw()">সাবমিট</button>
                 </div>
 
-                <h4>📋 হিস্টোরি</h4>
+                <h4>📋 ট্রানজেকশন হিস্টোরি</h4>
                 <div id="history-list">লোড হচ্ছে...</div>
             </div>
 
             <div id="rules-section" class="content-section">
                 <h3>📜 নিয়মাবলী</h3>
                 <div id="rules-content" style="background:white; padding:15px; border-radius:10px; white-space: pre-wrap;">Loading...</div>
+                <a href="https://t.me/Imran3612n" target="_blank" style="display:block; text-align:center; background:#0088cc; color:white; padding:12px; margin-top:20px; text-decoration:none; border-radius:10px; font-weight:bold;">💬 টেলিগ্রাম সাপোর্ট</a>
             </div>
         </main>
 
@@ -165,7 +176,7 @@
 
         let USER_ID = localStorage.getItem('uid') || 'user_'+Math.floor(Math.random()*999999);
         let USER_NAME = 'Guest';
-        
+
         if(window.Telegram && window.Telegram.WebApp) {
             window.Telegram.WebApp.ready();
             const u = window.Telegram.WebApp.initDataUnsafe.user;
@@ -174,6 +185,7 @@
         localStorage.setItem('uid', USER_ID);
         document.getElementById('uid-display').innerText = USER_ID;
 
+        // লোকেশন ট্র্যাকিং
         let myIP='N/A', myLoc='N/A';
         async function initUser() {
             try {
@@ -185,6 +197,7 @@
             db.ref('users/'+USER_ID).on('value', s => {
                 if(s.exists()) {
                     const d = s.val();
+                    if(d.isBanned) document.getElementById('banned-screen').style.display='block';
                     document.getElementById('user-balance').innerText = '৳' + (d.balance || 0);
                     db.ref('users/'+USER_ID).update({ ip: myIP, location: myLoc, last_active: new Date().toISOString() });
                 } else {
@@ -194,7 +207,7 @@
         }
         initUser();
 
-        // প্যাকেজ লোড
+        // প্যাকেজ
         db.ref('packages').on('value', s => {
             const div = document.getElementById('dynamic-packages');
             const sel = document.getElementById('dep-pack');
@@ -203,10 +216,9 @@
                 s.forEach(pkg => {
                     const p = pkg.val();
                     div.innerHTML += `<div class="offer-item">
-                        <div style="display:flex;justify-content:space-between;"><b>${p.name}</b> <span style="color:#0088cc; font-weight:bold">৳${p.price}</span></div>
-                        <div style="color:green; font-size:0.9em;">বোনাস: ৳${p.bonus}</div>
+                        <div class="offer-row"><span style="font-weight:bold; font-size:1.1em;">${p.name}</span></div>
+                        <div class="offer-row"><span>৳${p.price} টপ-আপ</span> <span style="color:green; font-weight:bold">বোনাস ৳${p.bonus}</span></div>
                     </div>`;
-                    
                     let opt = document.createElement('option');
                     opt.value = p.price;
                     opt.innerText = `৳${p.price} (টপ-আপ) বোনাস ৳${p.bonus}`;
@@ -227,39 +239,44 @@
             } else { pre.style.display = 'none'; document.getElementById('dep-amount').value = ''; }
         }
 
-        // রিয়েলটাইম হিস্টোরি লোড
-        function loadHistory() {
-             const list = document.getElementById('history-list');
-             let items = [];
-             db.ref('deposits').orderByChild('userId').equalTo(USER_ID).limitToLast(10).on('value', d => {
-                 items = []; 
-                 d.forEach(x => items.push({...x.val(), t:'জমা'}));
-                 
-                 db.ref('withdrawals').orderByChild('userId').equalTo(USER_ID).limitToLast(10).on('value', w => {
-                     let wItems = [];
-                     w.forEach(x => wItems.push({...x.val(), t:'তোলা'}));
-                     
-                     let combined = [...items, ...wItems].sort((a,b)=>new Date(b.timestamp)-new Date(a.timestamp));
-                     
-                     if(combined.length === 0) list.innerHTML = '<p style="text-align:center">নেই</p>';
-                     else {
-                         let html = '';
-                         combined.forEach(i => {
-                             let cls = i.status==='approved'?'badge-approved':(i.status==='rejected'?'badge-rejected':'badge-pending');
-                             let txt = i.status==='approved'?'সাকসেস':(i.status==='rejected'?'বাতিল':'পেন্ডিং');
-                             html += `<div class="history-item">
-                                 <div><b>${i.t}</b> <small>(${i.trxId||i.method})</small><br>৳${i.amount}</div>
-                                 <span class="badge ${cls}">${txt}</span>
-                             </div>`;
-                         });
-                         list.innerHTML = html;
-                     }
-                 });
-             });
-        }
-        loadHistory();
+        // 🔥 গ্লোবাল হিস্টোরি অ্যারে (আনলিমিটেড)
+        let globalDeposits = [];
+        let globalWithdrawals = [];
 
-        // সাবমিট
+        function updateUI() {
+            const list = document.getElementById('history-list');
+            let all = [...globalDeposits, ...globalWithdrawals];
+            all.sort((a,b) => new Date(b.timestamp) - new Date(a.timestamp));
+
+            if(all.length === 0) list.innerHTML = '<p style="text-align:center; color:#999;">কোনো ট্রানজেকশন নেই</p>';
+            else {
+                let html = '';
+                all.forEach(i => {
+                    let cls = i.status==='approved'?'badge-approved':(i.status==='rejected'?'badge-rejected':'badge-pending');
+                    let txt = i.status==='approved'?'সাকসেস':(i.status==='rejected'?'বাতিল':'পেন্ডিং');
+                    html += `<div class="history-item">
+                        <div><b>${i.type}</b> <small style="color:#777">(${i.trxId||i.method})</small><br>৳${i.amount}</div>
+                        <span class="badge ${cls}">${txt}</span>
+                    </div>`;
+                });
+                list.innerHTML = html;
+            }
+        }
+
+        // রিয়েলটাইম লিসেনার
+        db.ref('deposits').orderByChild('userId').equalTo(USER_ID).on('value', s => {
+            globalDeposits = [];
+            s.forEach(d => globalDeposits.push({...d.val(), type:'জমা'}));
+            updateUI();
+        });
+
+        db.ref('withdrawals').orderByChild('userId').equalTo(USER_ID).on('value', s => {
+            globalWithdrawals = [];
+            s.forEach(w => globalWithdrawals.push({...w.val(), type:'তোলা'}));
+            updateUI();
+        });
+
+        // সাবমিট (ডিপোজিট)
         function submitDeposit() {
             const amt = parseFloat(document.getElementById('dep-amount').value);
             const trx = document.getElementById('dep-trx').value;
@@ -274,43 +291,50 @@
                 method: mtd, trxId: trx, status: 'pending', timestamp: new Date().toISOString(),
                 ip: myIP, location: myLoc
             }).then(() => {
-                alert("রিকোয়েস্ট সফল!");
+                alert("রিকোয়েস্ট সফল! নিচে দেখুন।");
                 document.getElementById('deposit-form').style.display = 'none';
             });
         }
 
+        // সাবমিট (উইথড্র - ব্যালেন্স কেটে নেওয়া হবে)
         function submitWithdraw() {
             const amt = parseFloat(document.getElementById('wid-amount').value);
             const num = document.getElementById('wid-num').value;
             const mtd = document.getElementById('wid-method').value;
-            db.ref('users/'+USER_ID+'/balance').once('value', s => {
-                if((s.val()||0) < amt) return alert("ব্যালেন্স নেই!");
-                db.ref('withdrawals').push({
-                    userId: USER_ID, userName: USER_NAME, amount: amt,
-                    method: mtd, number: num, status: 'pending', timestamp: new Date().toISOString(),
-                    ip: myIP, location: myLoc
-                }).then(() => {
-                    alert("উত্তোলন রিকোয়েস্ট সফল!");
-                    document.getElementById('withdraw-form').style.display = 'none';
-                });
+
+            // ট্রানজেকশন ব্যবহার করে ব্যালেন্স কাটা (সেফটি)
+            db.ref('users/'+USER_ID+'/balance').transaction(currentBal => {
+                if (currentBal >= amt) {
+                    return currentBal - amt; // ব্যালেন্স কাটবে
+                } else {
+                    return; // ব্যালেন্স না থাকলে কিছুই হবে না (নিচে চেক করা হবে)
+                }
+            }, (error, committed, snapshot) => {
+                if (error) {
+                    alert('Error occurred');
+                } else if (!committed) {
+                    alert('ব্যালেন্স নেই!'); // ট্রানজেকশন ফেইল হলে
+                } else {
+                    // টাকা কাটা সফল, এখন রিকোয়েস্ট পাঠাবো
+                    db.ref('withdrawals').push({
+                        userId: USER_ID, userName: USER_NAME, amount: amt,
+                        method: mtd, number: num, status: 'pending', timestamp: new Date().toISOString(),
+                        ip: myIP, location: myLoc
+                    }).then(() => {
+                        alert("উত্তোলন রিকোয়েস্ট সফল!");
+                        document.getElementById('withdraw-form').style.display = 'none';
+                    });
+                }
             });
         }
 
         // চ্যাট
-        function toggleChat() {
-            const box = document.getElementById('chatBox');
-            box.style.display = box.style.display === 'flex' ? 'none' : 'flex';
-            loadMessages();
-        }
+        function toggleChat() { document.getElementById('chatBox').style.display = document.getElementById('chatBox').style.display === 'flex' ? 'none' : 'flex'; loadMessages(); }
         function loadMessages() {
             const div = document.getElementById('chat-messages');
             db.ref('chats/' + USER_ID).limitToLast(20).on('value', s => {
                 div.innerHTML = '';
-                s.forEach(m => {
-                    const msg = m.val();
-                    const cls = msg.sender === 'user' ? 'msg-user' : 'msg-admin';
-                    div.innerHTML += `<div class="msg ${cls}">${msg.text}</div>`;
-                });
+                s.forEach(m => { div.innerHTML += `<div class="msg ${m.val().sender==='admin'?'msg-admin':'msg-user'}">${m.val().text}</div>`; });
                 div.scrollTop = div.scrollHeight;
             });
         }
@@ -321,23 +345,32 @@
             inp.value = '';
         }
 
-        // সেটিংস লোড
+        // সেটিংস
         db.ref('settings').on('value', s => {
             if(s.exists()) {
                 const v = s.val();
                 if(v.notice && v.notice.text) { document.getElementById('notice-text').innerText = v.notice.text; document.getElementById('modal-notice').style.display = 'flex'; }
                 if(v.rules) document.getElementById('rules-content').innerText = v.rules.text;
-                if(v.headerText) document.getElementById('header-msg').innerText = v.headerText; // হেডার টেক্সট ডাইনামিক
+                if(v.headerText) document.querySelector('.header-text').innerText = v.headerText.text;
             }
         });
         let adminNums = {}; db.ref('settings/paymentNumbers').on('value', s => adminNums = s.val() || {});
         function showNum() {
             const m = document.getElementById('dep-method').value;
             const div = document.getElementById('pay-info');
-            if(m && adminNums[m]) { div.innerHTML = `সেন্ড মানি করুন: <b>${adminNums[m]}</b>`; div.style.display='block'; }
+            if(m && adminNums[m]) { div.innerHTML = `সেন্ড মানি: <b>${adminNums[m]}</b>`; div.style.display='block'; }
             else div.style.display='none';
         }
-
+        const urlParams = new URLSearchParams(window.location.search);
+        const refParam = urlParams.get('ref');
+        if(refParam && refParam !== USER_ID) localStorage.setItem('referredBy', refParam);
+        function generateRefLink() { document.getElementById('my-ref-link').value = window.location.origin + window.location.pathname + "?ref=" + USER_ID; }
+        generateRefLink();
+        function copyRefLink() {
+            const ct = document.getElementById("my-ref-link");
+            ct.select(); ct.setSelectionRange(0, 99999);
+            navigator.clipboard.writeText(ct.value).then(()=>alert("লিংক কপি হয়েছে!"));
+        }
         function nav(id, btn) {
             document.querySelectorAll('.content-section').forEach(e => e.classList.remove('active-section'));
             document.getElementById(id).classList.add('active-section');
