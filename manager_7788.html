@@ -34,7 +34,7 @@
         <ul>
             <li onclick="show('dash')" class="active">ড্যাশবোর্ড</li>
             <li onclick="show('req')">পেন্ডিং রিকোয়েস্ট</li>
-            <li onclick="show('users')">ইউজার ও ব্যান</li>
+            <li onclick="show('users')">ইউজার & ট্র্যাকিং</li>
             <li onclick="show('pack')">প্যাকেজ ম্যানেজ</li>
             <li onclick="show('chat')">লাইভ চ্যাট</li>
             <li onclick="show('set')">সেটিংস</li>
@@ -44,7 +44,7 @@
     <div class="main-content">
         <div id="dash" class="page-section active">
             <h1>ড্যাশবোর্ড</h1>
-            <div class="card"><h3>সার্ভার: <span style="color:green">অনলাইন ✅</span></h3></div>
+            <div class="card"><h3>সার্ভার: <span style="color:green">অনলাইন ✅</span> | একটিভ ইউজার: <span id="active-count">0</span></h3></div>
         </div>
 
         <div id="req" class="page-section">
@@ -92,6 +92,7 @@
         <div id="set" class="page-section">
             <h1>সেটিংস</h1>
             <div class="card">
+                <label>হেডার টেক্সট (User App):</label><br><textarea id="header-text" style="width:100%"></textarea><button class="btn btn-b" onclick="saveSet('headerText')">Save</button><br><br>
                 <label>নোটিশ:</label><br><textarea id="notice" style="width:100%"></textarea><button class="btn btn-b" onclick="saveSet('notice')">Save</button><br><br>
                 <label>নিয়ম:</label><br><textarea id="rules" style="width:100%"></textarea><button class="btn btn-b" onclick="saveSet('rules')">Save</button><br><br>
                 <label>বিকাশ:</label><input id="bkash"> <label>নগদ:</label><input id="nagad"> <button class="btn btn-b" onclick="saveNum()">Save</button>
@@ -124,13 +125,13 @@
         }
         show('dash');
 
-        // ১. রিকোয়েস্ট
+        // রিকোয়েস্ট
         db.ref('deposits').orderByChild('status').equalTo('pending').on('value', s => {
             const l = document.getElementById('dep-list'); l.innerHTML='';
             s.forEach(d => {
                 l.innerHTML += `<tr><td>${d.val().userName}<br>${d.val().location||'N/A'}</td>
                 <td>${d.val().method}<br>${d.val().trxId}</td>
-                <td>Main: ৳${d.val().amount}<br>Bonus: ৳${d.val().bonus}</td>
+                <td>৳${d.val().amount} (Bonus: ${d.val().bonus})</td>
                 <td><button class="btn btn-g" onclick="proc('${d.key}','deposits',true,${d.val().bonus},'${d.val().userId}')">✔</button>
                 <button class="btn btn-r" onclick="proc('${d.key}','deposits',false)">✖</button></td></tr>`;
             });
@@ -139,7 +140,7 @@
             const l = document.getElementById('wid-list'); l.innerHTML='';
             s.forEach(d => {
                 l.innerHTML += `<tr><td>${d.val().userName}<br>${d.val().location||'N/A'}</td>
-                <td>To: ${d.val().number}<br>${d.val().method}</td>
+                <td>${d.val().number}<br>${d.val().method}</td>
                 <td>৳${d.val().amount}</td>
                 <td><button class="btn btn-g" onclick="proc('${d.key}','withdrawals',true,0)">✔</button>
                 <button class="btn btn-r" onclick="proc('${d.key}','withdrawals',false,${d.val().amount},'${d.val().userId}')">✖</button></td></tr>`;
@@ -157,22 +158,24 @@
             }
         }
 
-        // ২. ইউজার ও ব্যান
+        // ইউজার ও ব্যান
         async function loadUsers() {
             const l = document.getElementById('user-list'); l.innerHTML='loading...';
             const s = await db.ref('users').get();
             l.innerHTML='';
+            let count = 0;
+            const today = new Date().toISOString().split('T')[0];
             s.forEach(u => {
                 const v = u.val();
-                const btnText = v.isBanned ? 'Unban' : 'Ban';
-                const btnColor = v.isBanned ? 'btn-g' : 'btn-r';
+                if(v.last_active && v.last_active.includes(today)) count++;
                 l.innerHTML += `<tr>
                     <td>${v.name}<br><small>${u.key}</small></td>
                     <td>${v.location||'N/A'}<br><small>${v.ip||'N/A'}</small></td>
                     <td>${v.balance} <button onclick="editBal('${u.key}')">✏</button></td>
-                    <td><button class="btn ${btnColor}" onclick="toggleBan('${u.key}', ${v.isBanned})">${btnText}</button></td>
+                    <td><button class="btn ${v.isBanned?'btn-g':'btn-r'}" onclick="toggleBan('${u.key}', ${v.isBanned})">${v.isBanned?'Unban':'Ban'}</button></td>
                 </tr>`;
             });
+            document.getElementById('active-count').innerText = count;
         }
         function toggleBan(uid, status) {
             if(confirm(status ? "Unban?" : "Ban?")) db.ref('users/'+uid).update({isBanned: !status}).then(()=>loadUsers());
@@ -190,13 +193,13 @@
             }
         }
 
-        // ৩. প্যাকেজ
+        // প্যাকেজ
         function loadPacks() {
             db.ref('packages').on('value', s => {
                 const l = document.getElementById('pack-list'); l.innerHTML='';
                 s.forEach(p => {
                     l.innerHTML += `<tr><td>${p.val().name}</td><td>${p.val().price}</td><td>${p.val().bonus}</td>
-                    <td><button class="btn btn-r" onclick="delPack('${p.key}')">Del</button></td></tr>`;
+                    <td><button class="btn btn-r" onclick="if(confirm('Delete?')) db.ref('packages/${p.key}').remove()">Del</button></td></tr>`;
                 });
             });
         }
@@ -204,9 +207,8 @@
             const n=document.getElementById('p-name').value, p=document.getElementById('p-price').value, b=document.getElementById('p-bonus').value;
             if(n&&p) db.ref('packages').push({name:n, price:parseFloat(p), bonus:parseFloat(b)});
         }
-        function delPack(k) { if(confirm('Delete?')) db.ref('packages/'+k).remove(); }
 
-        // ৪. চ্যাট
+        // চ্যাট
         let chatU = null;
         function loadChatUsers() {
             db.ref('chats').on('value', s => {
@@ -220,7 +222,10 @@
             chatU = uid; document.getElementById('chat-with').innerText = 'Chat: '+uid;
             db.ref('chats/'+uid).limitToLast(20).on('value', s => {
                 const d = document.getElementById('chat-display'); d.innerHTML='';
-                s.forEach(m => { d.innerHTML += `<div class="msg ${m.val().sender==='admin'?'msg-a':'msg-u'}">${m.val().text}</div>`; });
+                s.forEach(m => {
+                    const c = m.val().sender==='admin'?'msg-a':'msg-u';
+                    d.innerHTML += `<div class="msg ${c}">${m.val().text}</div>`;
+                });
                 d.scrollTop = d.scrollHeight;
             });
         }
@@ -229,14 +234,26 @@
             if(chatU && t) { db.ref('chats/'+chatU).push({sender:'admin', text:t, timestamp:new Date().toISOString()}); document.getElementById('chat-msg').value=''; }
         }
 
-        // ৫. সেটিংস
-        function saveSet(k) { db.ref('settings/'+k).set({text:document.getElementById(k==='notice'?'notice':'rules').value}).then(()=>alert('Saved')); }
-        function saveNum() { db.ref('settings/paymentNumbers').set({bkash:document.getElementById('bkash').value, nagad:document.getElementById('nagad').value}).then(()=>alert('Saved')); }
-        db.ref('settings').get().then(s=>{ if(s.exists()){ 
-            if(s.val().notice) document.getElementById('notice').value=s.val().notice.text;
-            if(s.val().rules) document.getElementById('rules').value=s.val().rules.text;
-            if(s.val().paymentNumbers) { document.getElementById('bkash').value=s.val().paymentNumbers.bkash; document.getElementById('nagad').value=s.val().paymentNumbers.nagad; }
-        }});
+        // সেটিংস
+        function saveSet(k) { 
+            const val = document.getElementById(k==='notice'?'notice':(k==='rules'?'rules':'header-text')).value;
+            db.ref('settings/'+k).set({text: val}).then(()=>alert('Saved'));
+        }
+        function saveNum() {
+            db.ref('settings/paymentNumbers').set({
+                bkash: document.getElementById('bkash').value,
+                nagad: document.getElementById('nagad').value
+            }).then(()=>alert('Saved'));
+        }
+        
+        db.ref('settings').get().then(s=>{
+            if(s.exists()){
+                if(s.val().notice) document.getElementById('notice').value=s.val().notice.text;
+                if(s.val().rules) document.getElementById('rules').value=s.val().rules.text;
+                if(s.val().headerText) document.getElementById('header-text').value=s.val().headerText.text;
+                if(s.val().paymentNumbers) { document.getElementById('bkash').value=s.val().paymentNumbers.bkash; document.getElementById('nagad').value=s.val().paymentNumbers.nagad; }
+            }
+        });
     </script>
 </body>
 </html>
