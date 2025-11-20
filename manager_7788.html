@@ -139,13 +139,14 @@
             });
         });
 
+        // 🔥 ফিক্সড: রিফান্ড লজিক
         function proc(k, type, ok, amt, uid) {
             if(!confirm('Confirm?')) return;
             if(ok) {
                 if(type==='deposits') db.ref('users/'+uid+'/balance').transaction(c=>(c||0)+amt);
                 db.ref(type+'/'+k).update({status:'approved'});
             } else {
-                // উইথড্র রিজেক্ট হলে টাকা ফেরত (Refund)
+                // উইথড্র রিজেক্ট হলে টাকা ফেরত
                 if(type==='withdrawals') db.ref('users/'+uid+'/balance').transaction(c=>(c||0)+amt);
                 db.ref(type+'/'+k).update({status:'rejected'});
             }
